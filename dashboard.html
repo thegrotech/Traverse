@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>// Redirect to login if user is not logged in
+if (localStorage.getItem('isLoggedIn') !== 'true') {
+  window.location.href = 'login.html';
+}
+</script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Trip Again — Dashboard</title>
+
+  <!-- favicon / manifest (optional, add files when ready) -->
+  <!-- <link rel="manifest" href="/manifest.json"> -->
+
+  <!-- Fonts & icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    :root{
+  --bg-900:#060606;
+  --bg-800:#0b0b0b;
+  --bg-700:#121212;
+  --card:#0f1720;
+  --muted:#9aa3ac;
+  --accent:#ff3b3b;
+  --accent-2:#ff6b35;
+  --glass: rgba(255,255,255,0.03);
+  --glass-strong: rgba(255,255,255,0.04);
+  --radius:16px;
+  --glass-border: rgba(255,255,255,0.04);
+  color-scheme: dark;
+  
+  /* Text colors for dark theme */
+  --text-primary: #e6eef6;
+  --text-secondary: #9aa3ac;
+  --text-muted: #6b7280;
+  --shadow-color: rgb(38, 38, 39);
+  --shadow: 0 10px 30px var(--shadow-color);
+}
+
+[data-theme="light"]{
+  --bg-900:#f5f7fb;
+  --bg-800:#eef2f7;
+  --bg-700:#e6ebf2;
+  --card:#ffffff;
+  --muted:#475569;
+  --accent:#c62828;
+  --accent-2:#ff4d4d;
+  --glass: rgba(0,0,0,0.03);
+  --glass-strong: rgba(0,0,0,0.04);
+  --glass-border: rgba(0,0,0,0.08);
+  --color-scheme: light;
+  --shadow-color: rgb(0, 0, 0);
+  
+  /* Text colors for light theme */
+  --text-primary: #1a202c;
+  --text-secondary: #4a5568;
+  --text-muted: #718096;
+  --shadow-color: rgba(0, 0, 0, 0.06);
+  --shadow: 0 8px 20px var(--shadow-color);
+}
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg,var(--bg-900),var(--bg-800));
+      color: var(--text-primary); /* Changed from #e6eef6 */
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      padding:28px;
+    }
+
+    /* Shell */
+    .app {
+      width:100%;
+      max-width:1200px;
+      min-height:80vh;
+      border-radius:20px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* header */
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:22px 26px;
+      border-bottom:1px solid var(--glass-border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+    }
+
+    .brand {
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+
+    .brand-logo {
+      width:56px;height:56px;border-radius:12px;
+      background-image: url('logo.png');
+      background-size: contain; background-position:center; background-repeat:no-repeat;
+      box-shadow: 0 6px 24px rgba(255,59,59,0.08);
+      background-color: rgba(255,255,255,0.02);
+      flex:0 0 56px;
+    }
+
+    .brand-title {
+      display:flex;flex-direction:column;line-height:1;
+    }
+    .brand-title .name { font-family: "Cinzel Decorative", serif; font-weight:500; font-size:18px; color:var(--accent-2); }
+    /* Fix the toolbox header subtitle */
+.brand-title .subtitle { 
+  font-size:12px; 
+  color:var(--text-muted); 
+  margin-top:2px; 
+  letter-spacing:1px; 
+  text-transform:uppercase; 
+}
+
+/* Fix search icon color */
+.search i {
+  color: var(--text-muted) !important;
+}
+
+/* Fix user icon container */
+.top-actions > div:last-child {
+  color: var(--text-secondary) !important;
+}
+
+/* Fix more tools icon color */
+.card .icon[style*="color:var(--muted)"] {
+  color: var(--text-muted) !important;
+}
+
+/* Fix footer text colors */
+.foot div:last-child div {
+  color: var(--text-muted) !important;
+}
+
+    /* header actions */
+    .top-actions { display:flex; align-items:center; gap:12px; }
+
+    .search {
+      display:flex; align-items:center; gap:8px;
+      background:var(--glass); padding:8px 12px; border-radius:12px; border:1px solid var(--glass-border);
+      color:var(--text-muted); min-width:220px;
+    }
+    .search input{
+      background:transparent; border:0; outline:none; color:inherit; font-size:14px; width:100%;
+    }
+.icon-btn {
+  background:transparent; 
+  border:0; 
+  color: var(--text-secondary); /* Changed from var(--muted) */
+  padding:10px; 
+  border-radius:10px; 
+  cursor:pointer;
+}
+    .icon-btn:hover { color:var(--accent-2); transform:translateY(-2px); }
+
+    /* layout */
+    .main {
+      display:grid;
+      grid-template-columns: 1fr 340px;
+      gap:24px;
+      padding:26px;
+    }
+
+    /* left area - tools grid */
+    .tools {
+      display:grid;
+      grid-template-columns: repeat(2,1fr);
+      gap:18px;
+    }
+    @media (max-width:900px){
+      .main { grid-template-columns: 1fr; padding:18px; }
+      .tools { grid-template-columns: repeat(1,1fr); }
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+      border-radius:14px;
+      padding:18px;
+      min-height:120px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      border: 1px solid var(--glass-border);
+      transition: transform 220ms ease, box-shadow 220ms ease;
+      position:relative;
+    }
+.card:hover { 
+  transform: translateY(-6px); 
+  box-shadow: 0 18px 50px var(--shadow-color); /* Updated */
+}
+    .card .top { display:flex; align-items:center; gap:12px; }
+    .card .icon {
+      width:48px; height:48px; border-radius:10px; display:grid; place-items:center; font-size:20px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.03); color:var(--accent-2);
+    }
+    .card .title { font-size:16px; font-weight:600; }
+    .card .desc { color: var(--text-secondary); /* Changed from var(--muted) */; font-size:13px; margin-top:8px; }
+
+    .card .actions { display:flex; gap:10px; margin-top:12px; }
+    .btn {
+      padding:10px 12px; border-radius:10px; border:0; cursor:pointer; font-weight:600; font-size:13px;
+    }
+    .btn.primary { background: linear-gradient(90deg,var(--accent),var(--accent-2)); color:white; box-shadow:0 8px 24px rgba(255,60,60,0.18); }
+    .btn.ghost { background:transparent; border: 1px solid var(--glass-border); color: var(--text-secondary); /* Changed from var(--muted) */ }
+
+    /* right column (panel) */
+    .panel {
+      padding:18px;
+      border-radius:14px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+      border: 1px solid var(--glass-border);
+      min-height:280px;
+    }
+    .panel h3 { margin:0 0 8px 0; font-size:15px; }
+    .quick-list { display:flex; flex-direction:column; gap:8px; margin-top:12px; }
+.quick-item {
+  display:flex; 
+  align-items:center; 
+  justify-content:space-between; 
+  gap:8px;
+  padding:10px; 
+  border-radius:10px; 
+  background:var(--glass); 
+  border:1px solid var(--glass-border);
+}
+
+.quick-item > div:first-child {
+  color: var(--text-primary);
+}
+
+.quick-item > div:first-child > div:first-child {
+  font-weight:700;
+  color: var(--text-primary);
+}
+
+.quick-item > div:first-child > div:last-child {
+  color: var(--text-muted);
+  font-size:13px;
+}
+    /* footer / small */
+    .foot {
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      padding:18px; border-top:1px dashed rgba(255,255,255,0.03); font-size:13px; color:var(--text-muted);
+    }
+
+    /* responsiveness small */
+    @media (max-width:540px){
+      .brand-title .name { font-size:16px }
+      .brand-title .subtitle { font-size:11px }
+      .search { display:none; }
+      .topbar { padding:14px }
+      .card { padding:14px }
+      .card .icon { width:44px;height:44px }
+    }
+
+    /* small helper */
+    .soon {
+      position:absolute; top:12px; right:12px; font-size:11px; color:var(--text-muted); background:transparent;
+    }
+
+    /* subtle loading / skeleton for later */
+    .skeleton { background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.03), rgba(255,255,255,0.02)); border-radius:8px; }
+
+  </style>
+</head>
+<body>
+  <div class="app" id="app" data-theme="dark">
+    <!-- TOP BAR -->
+    <header class="topbar" role="banner">
+      <div class="brand" aria-hidden="false">
+        <div class="brand-logo" role="img" aria-label="Trip Again logo"></div>
+        <div class="brand-title" aria-hidden="true">
+          <div class="name">TRIP AGAIN</div>
+          <div style="margin-top:06px;" class="subtitle">Admin Panel</div>
+        </div>
+      </div>
+
+      <div class="top-actions" role="navigation" aria-label="Top actions">
+        <div class="search" role="search" aria-label="Search tools">
+          <i class="fas fa-search" style="color:var(--muted)"></i>
+          <input id="searchInput" placeholder="Search tools, invoices, vouchers..." />
+        </div>
+
+        <button class="icon-btn" id="themeToggle" aria-pressed="false" title="Toggle theme">
+          <i class="fas fa-moon"></i>
+        </button>
+
+        <button class="icon-btn" id="helpBtn" title="Help">
+          <i class="fas fa-question-circle"></i>
+        </button>
+        <button class="icon-btn" onclick="logout()" title="Logout">
+         <i class="fas fa-sign-out-alt"></i>
+        </button>
+
+<div style="width:42px;height:42px;border-radius:10px;background:var(--glass);display:grid;place-items:center;color:var(--text-secondary)">
+  <div class="icon" style="color:var(--text-muted)"><i class="fas fa-box-open"></i></div>
+</div>
+    </header>
+
+    <!-- MAIN -->
+    <main class="main" role="main">
+      <section class="left">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <h2 style="margin:0;font-size:20px">Your Toolbox</h2>
+          <div style="color:var(--text-muted);font-size:13px">Quick access to essential tools</div>
+        </div>
+
+        <div class="tools" id="toolsGrid">
+          <!-- Invoice -->
+          <article class="card" id="invoiceCard" role="article" aria-labelledby="invoiceTitle">
+            <div class="top">
+              <div class="icon"><i class="fas fa-file-invoice-dollar"></i></div>
+              <div>
+                <div class="title" id="invoiceTitle">Invoice Generator</div>
+                <div class="desc">Create, download & email invoices quickly.</div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn primary" data-action="invoice">Open</button>
+              <button class="btn ghost" onclick="copyHint(this,'invoice')">Copy ID</button>
+            </div>
+            <div class="soon">v1.0</div>
+          </article>
+
+          <!-- Voucher -->
+          <article class="card" id="voucherCard" role="article" aria-labelledby="voucherTitle">
+            <div class="top">
+              <div class="icon"><i class="fas fa-ticket-alt"></i></div>
+              <div>
+                <div class="title" id="voucherTitle">Voucher Generator</div>
+                <div class="desc">Generate vouchers, templates & printable versions.</div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn primary" data-action="voucher">Open</button>
+              <button class="btn ghost" onclick="copyHint(this,'voucher')">Copy ID</button>
+            </div>
+            <div class="soon">v1.0</div>
+          </article>
+
+          <!-- Umrah Expense -->
+          <article class="card" id="umrahCard" role="article" aria-labelledby="umrahTitle">
+            <div class="top">
+              <div class="icon"><i class="fas fa-praying-hands"></i></div>
+              <div>
+                <div class="title" id="umrahTitle">Umrah Expense Calculator</div>
+                <div class="desc">Estimate travel, food, & accommodation costs.</div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn primary" data-action="umrah">Open</button>
+              <button class="btn ghost" onclick="copyHint(this,'umrah')">Copy ID</button>
+            </div>
+            <div class="soon">v1.0</div>
+          </article>
+
+          <!-- More tools -->
+          <article class="card" id="moreCard" role="article" aria-labelledby="moreTitle">
+            <div class="top">
+              <div class="icon" style="color:var(--muted)"><i class="fas fa-box-open"></i></div>
+              <div>
+                <div class="title" id="moreTitle">More Tools</div>
+                <div class="desc">Planned features: Reports, Analytics, PNR importer & more.</div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn ghost" disabled>Coming Soon</button>
+            </div>
+            <div class="soon">+4</div>
+          </article>
+        </div>
+
+        <!-- optional area for promoted tool -->
+        <div style="margin-top:18px">
+          <div class="card" style="display:flex;gap:12px;align-items:center;">
+            <div style="flex:1">
+              <div style="font-weight:700">Tip</div>
+              <div style="color:var(--text-muted);margin-top:6px">Click "Open" to navigate to each tool. These are placeholders: integrate your modules into <code>data-action</code> handlers.</div>
+            </div>
+            <div><button class="btn primary" onclick="openBuilder()">Open Builder</button></div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- RIGHT PANEL -->
+      <aside class="panel" aria-label="Right sidebar">
+        <h3>Quick actions</h3>
+
+        <div class="quick-list">
+          <div class="quick-item">
+            <div>
+              <div style="font-weight:700">New Invoice</div>
+              <div style="color:var(--text-muted);font-size:13px">Blank invoice using default company profile</div>
+            </div>
+            <button class="btn primary" onclick="triggerAction('invoice')">Create</button>
+          </div>
+
+          <div class="quick-item">
+            <div>
+              <div style="font-weight:700">New Voucher</div>
+              <div style="color:var(--text-muted);font-size:13px">Voucher template generator</div>
+            </div>
+            <button class="btn ghost" onclick="triggerAction('voucher')">Open</button>
+          </div>
+
+          <div style="height:12px"></div>
+
+          <h3 style="margin-top:8px">Recent</h3>
+          <div style="margin-top:8px" id="recentList">
+            <div class="quick-item">No recent items yet</div>
+          </div>
+        </div>
+
+      </aside>
+    </main>
+
+<div class="foot">
+  <div style="color:var(--text-primary)">© Trip Again Pvt Ltd</div>
+  <div style="display:flex;gap:12px;align-items:center">
+    <div style="color:var(--text-muted)">v1.0</div>
+    <div style="color:var(--text-muted)">—</div>
+    <div style="color:var(--text-muted)">Developed by GroTech Solutions</div>
+  </div>
+</div>
+
+<script>
+// ---------- Theme toggle ----------
+(function(){
+  const app = document.getElementById('app');
+  const toggle = document.getElementById('themeToggle');
+  const icon = toggle.querySelector('i');
+
+  // Load saved theme or default to dark
+  const savedTheme = localStorage.getItem('ta_theme') || 'dark';
+  app.setAttribute('data-theme', savedTheme);
+  
+  // Set correct icon based on saved theme
+  icon.className = savedTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+  
+  // Set correct aria-pressed state
+  toggle.setAttribute('aria-pressed', savedTheme === 'light');
+
+  // Set body background based on saved theme
+  document.body.style.background = savedTheme === 'light' 
+    ? 'white' 
+    : 'linear-gradient(180deg,var(--bg-900),var(--bg-800))';
+
+  toggle.addEventListener('click', () => {
+    const currentTheme = app.getAttribute('data-theme');
+    const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    app.setAttribute('data-theme', nextTheme);
+    localStorage.setItem('ta_theme', nextTheme);
+    
+    // Update icon
+    icon.className = nextTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+    
+    // Update aria-pressed
+    toggle.setAttribute('aria-pressed', nextTheme === 'light');
+    
+    // Update body background
+    document.body.style.background = nextTheme === 'light'
+      ? 'white'
+      : 'linear-gradient(180deg,var(--bg-900),var(--bg-800))';
+  });
+})();
+
+
+  // ---------- Tool actions ----------
+  function triggerAction(name){
+    // Route to your actual hosted modules
+    const links = {
+      invoice: 'create-invoice.html',
+      voucher: 'generate-voucher.html',
+      umrah: 'calculate-umrah-expenses.html'
+    };
+
+    if (links[name]) {
+      window.open(links[name], '_blank'); // opens in new tab
+      addRecent(name.charAt(0).toUpperCase() + name.slice(1));
+    } else {
+      alert('Coming soon...');
+    }
+  }
+
+  // Hook all "Open" buttons
+  document.querySelectorAll('.card .btn.primary').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const card = e.currentTarget.closest('.card');
+      const action = card.querySelector('.btn.primary').getAttribute('data-action');
+      triggerAction(action);
+    });
+  });
+
+  // ---------- Copy ID ----------
+  function copyHint(el, id){
+    navigator.clipboard?.writeText(id).then(()=> {
+      const prev = el.innerText;
+      el.innerText = 'Copied';
+      setTimeout(()=> el.innerText = prev, 900);
+    }).catch(()=> {
+      el.innerText = 'Failed';
+      setTimeout(()=> el.innerText = 'Copy ID', 900);
+    });
+  }
+
+  // ---------- Add recent items ----------
+  function addRecent(text){
+    const recent = document.getElementById('recentList');
+    const item = document.createElement('div');
+    item.className = 'quick-item';
+    item.innerHTML = `<div style="font-weight:700; color: var(--text-primary)">${text}</div><div style="color:var(--text-muted)">${new Date().toLocaleString()}</div>`;
+    recent.prepend(item);
+    if(recent.children.length > 6) recent.removeChild(recent.lastChild);
+  }
+
+  // ---------- Search tools ----------
+  document.getElementById('searchInput').addEventListener('input', (e)=>{
+    const q = e.target.value.trim().toLowerCase();
+    document.querySelectorAll('.card').forEach(card=>{
+      const t = card.innerText.toLowerCase();
+      card.style.display = q ? (t.includes(q) ? 'flex' : 'none') : 'flex';
+    });
+  });
+  function logout() {
+  localStorage.removeItem('isLoggedIn');
+  window.location.href = 'login.html';
+}
+</script>
+
+</body>
+</html>

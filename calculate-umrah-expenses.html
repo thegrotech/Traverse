@@ -1,0 +1,1208 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Umrah Expense Calculator — Trip Again</title>
+
+  <!-- ===== Simple Creative Red/Black Theme CSS ===== -->
+  <style>
+    :root{
+      --brand-red:#e10600;
+      --dark:#111;
+      --card:#ffffff;
+      --bg-start: #e10600;
+      --bg-end: #000000;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%; margin:0; font-family: "Poppins", system-ui, Arial; -webkit-font-smoothing:antialiased}
+    body{
+      background: transparent;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      padding:40px 16px;
+      color:var(--dark);
+    }
+
+    .app {
+      width:100%;
+      max-width:1080px;
+      background:transparent;
+    }
+
+    .card {
+      background:var(--card);
+      border-radius:16px;
+      padding:20px;
+      box-shadow:0 18px 50px rgba(0,0,0,0.45);
+      margin-bottom:18px;
+      overflow:hidden;
+    }
+
+    header.app-header{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      margin-bottom:18px;
+      color:white;
+    }
+
+    header .brand-title{
+      font-weight:700;
+      font-size:20px;
+      letter-spacing:1px;
+      text-transform:uppercase;
+    }
+
+    .top-info{
+      color:#fff;
+      margin-bottom:14px;
+    }
+
+    h2.section-title{
+      margin:0 0 12px 0;
+      font-size:18px;
+      color:var(--dark);
+    }
+
+    .grid-3 {
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+    }
+    .grid-2 {
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:10px;
+    }
+    label{display:block; font-weight:600; margin-bottom:6px; color:#333}
+    input[type="number"], input[type="date"], select {
+      width:100%;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid #e6e6e6;
+      font-size:14px;
+      background:#fff;
+    }
+
+    input[readonly] {
+      width:100%;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid #e6e6e6;
+      font-size:14px;
+      background:#fff;
+}
+
+    .muted{font-size:13px;color:#666;margin-bottom:8px}
+    .btn {
+      display:inline-block;
+      background:linear-gradient(90deg,var(--brand-red),#b00000);
+      color:#fff;
+      padding:12px 16px;
+      border-radius:10px;
+      border:none;
+      font-weight:700;
+      cursor:pointer;
+      width:100%;
+      box-shadow:0 8px 20px rgba(225,6,0,0.25);
+      transition:transform .15s ease;
+    }
+    .btn:hover{transform:translateY(-3px)}
+    .small-btn{padding:8px 10px; font-size:13px; border-radius:8px}
+
+    .sub-total {
+      margin-top:10px;
+      padding:12px;
+      border-radius:10px;
+      background:linear-gradient(180deg,#fff,#fbfbfb);
+      border-left:6px solid var(--brand-red);
+      font-weight:700;
+      color:#111;
+    }
+
+    .summary {
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .summary .box {
+      background:#fff;
+      padding:12px;
+      border-radius:10px;
+      min-width:180px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.08);
+    }
+
+    .right {
+      text-align:right;
+    }
+
+    footer.page-footer {
+      margin-top:8px;
+      color:#fff;
+      font-size:14px;
+      text-align:left;
+    }
+
+    /* responsive */
+    @media (max-width:880px){
+      .grid-3{grid-template-columns:1fr}
+      .grid-2{grid-template-columns:1fr}
+      .summary .box{min-width:unset; width:100%}
+    }
+/* Optimized Video Styles */
+.video-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+  /* Hardware acceleration */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000;
+}
+
+.video-background video {
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) translateZ(0);
+  object-fit: cover;
+  /* Better performance */
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.video-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+.logo-container {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+}
+
+.logo {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+#perAdult, #perChild, #perInfant {
+    margin-bottom: 4px;
+    min-height: 18px; /* Maintain consistent height */
+}
+/* Add this to your CSS for better date validation */
+input[type="date"]:invalid {
+  border-color: #e10600;
+  background-color: #fff0f0;
+}
+
+input[type="date"]:valid {
+  border-color: #00cc00;
+}
+  </style>
+</head>
+<body>
+<!-- Optimized Video Background -->
+<div class="video-background">
+  <video autoplay muted loop playsinline preload="auto" poster="backgroundimage.jpg">
+    
+    <!-- Fallback -->
+    <img src="backgroundimage.jpg" alt="Masjid al-Haram">
+  </video>
+</div>
+<div class="video-overlay"></div>
+  <div class="app">
+    <!-- header -->
+<header class="app-header">
+  <div class="logo-container">
+    <img src="logo.svg" alt="Trip Again Logo" class="logo" onerror="this.onerror=null; this.src='logo.jpg'">
+  </div>
+  <div>
+    <div class="brand-title">Trip Again Pvt Ltd</div>
+    <div class="muted" style="color:#fff">Agent & Public calculator — rates visible, not editable</div>
+  </div>
+</header>
+
+    <!-- calculator card -->
+    <div class="card" id="calculatorCard">
+      <h2 class="section-title">Step 1 — Tickets</h2>
+
+      <div class="grid-3" style="margin-bottom:12px">
+        <div>
+          <label>Adult Ticket Price (PKR)</label>
+          <input type="number" id="adultPriceSAR">
+        </div>
+        <div>
+          <label>Child Ticket Price (PKR)</label>
+          <input type="number" id="childPriceSAR">
+        </div>
+        <div>
+          <label>Infant Ticket Price (PKR)</label>
+          <input type="number" id="infantPriceSAR">
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <div>
+          <label>No. of Adults</label>
+          <input type="number" id="noAdults" min="0" value="1">
+        </div>
+        <div>
+          <label>No. of Children</label>
+          <input type="number" id="noChildren" min="0" value="0">
+        </div>
+        <div>
+          <label>No. of Infants</label>
+          <input type="number" id="noInfants" min="0" value="0">
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:14px">
+  <button class="btn small-btn" id="calcTicketsBtn" type="button">Calculate Tickets</button>
+</div>
+<div id="ticketsSubtotal" class="sub-total" style="display:none;margin-top:12px"></div>
+    </div>
+
+    <!-- hotels card (Makkah) -->
+    <div class="card" id="makkahCard">
+      <h2 class="section-title">Step 2 — Makkah Hotels</h2>
+      <div class="muted">Select hotel, room type, check-in / check-out, number of rooms.</div>
+
+      <div id="makkahList">
+        <!-- hotel blocks will be added here -->
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:10px">
+        <button class="btn small-btn" id="addMakkahBtn" type="button">+ Add Makkah Hotel</button>
+        <button class="btn small-btn" id="clearMakkahBtn" type="button" style="background:#444">Clear Makkah</button>
+      </div>
+
+      <div id="makkahSubtotal" class="sub-total" style="display:none;margin-top:12px"></div>
+    </div>
+
+    <!-- hotels card (Madinah) -->
+    <div class="card" id="madinahCard">
+      <h2 class="section-title">Step 3 — Madinah Hotels</h2>
+      <div class="muted">Select hotel, room type, check-in / check-out, number of rooms..</div>
+
+      <div id="madinahList"></div>
+
+      <div style="display:flex;gap:10px;margin-top:10px">
+        <button class="btn small-btn" id="addMadinahBtn" type="button">+ Add Madinah Hotel</button>
+        <button class="btn small-btn" id="clearMadinahBtn" type="button" style="background:#444">Clear Madinah</button>
+      </div>
+
+      <div id="madinahSubtotal" class="sub-total" style="display:none;margin-top:12px"></div>
+    </div>
+
+    <!-- transport -->
+    <div class="card" id="transportCard">
+      <h2 class="section-title">Step 4 — Transport</h2>
+      <div class="muted">Select Route, Vehicle Type & Number of Vehicle.</div>
+
+      <div id="transportList"></div>
+
+      <div style="display:flex;gap:10px;margin-top:10px">
+        <button class="btn small-btn" id="addTransportBtn" type="button">+ Add Transport</button>
+        <button class="btn small-btn" id="clearTransportBtn" type="button" style="background:#444">Clear Transport</button>
+      </div>
+
+      <div id="transportSubtotal" class="sub-total" style="display:none;margin-top:12px"></div>
+    </div>
+
+    <!-- visa & ziyarats -->
+    <div class="card" id="visaCard">
+      <h2 class="section-title">Step 5 — Visa & Ziyarat</h2>
+
+      <div class="grid-2">
+  <div>
+    <label>Umrah Visa (SAR per pax)</label>
+    <input type="number" id="visaSAR" readonly>
+  </div>
+  <div>
+    <label>Ziarat Makkah & Madina</label>
+    <label style="margin-top: 0px; padding: 08px 10px; border: 1px solid #ddd; border-radius: 10px; background-color: #f8f9fa; width: 100%;">
+      <input type="checkbox" id="includeZiyarat" checked style="width:auto;">
+      Include Ziyarat (SAR <span id="ziyaratAmount">25</span> per pax)
+    </label>
+    <input type="number" id="ziyaratSAR" readonly style="display:none;">
+</div>
+</div>
+
+      <div style="margin-top:10px" class="grid-2">
+        <div>
+          <label>Number of Applicants</label>
+          <input type="number" id="noApplicants" min="0" value="0">
+        </div>
+        <div>
+          <label>ROE (SAR → PKR)</label>
+          <input type="number" id="roeInput" readonly>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:12px">
+  <button class="btn small-btn" id="calcVisaBtn" type="button">Calculate Visa & Ziyarat</button>
+</div>
+<div id="visaSubtotal" class="sub-total" style="display:none;margin-top:12px"></div>
+    </div>
+
+    <!-- summary & run -->
+    <div class="card">
+      <h2 class="section-title">Summary & Grand Total</h2>
+
+      <div class="summary" style="margin-bottom:12px">
+        <div class="box">
+          <div style="font-size:13px;color:#666">Tickets Total</div>
+          <div id="summaryTickets" style="font-weight:800;font-size:16px">PKR 0</div>
+        </div>
+
+        <div class="box">
+          <div style="font-size:13px;color:#666">Hotels Total</div>
+          <div id="summaryHotels" style="font-weight:800;font-size:16px">PKR 0</div>
+        </div>
+
+        <div class="box">
+          <div style="font-size:13px;color:#666">Transport Total</div>
+          <div id="summaryTransport" style="font-weight:800;font-size:16px">PKR 0</div>
+        </div>
+
+        <div class="box">
+          <div style="font-size:13px;color:#666">Visa & Ziyarat</div>
+          <div id="summaryVisa" style="font-weight:800;font-size:16px">PKR 0</div>
+        </div>
+
+<div class="box right" style="flex:1">
+  <div style="font-size:13px;color:#666">Grand Total</div>
+  <div id="grandTotal" style="font-weight:900;font-size:20px">PKR 0</div>
+  
+  <div style="margin-top:12px; border-top:1px solid #eee; padding-top:8px">
+    <div style="font-size:13px;color:#666; margin-bottom:4px">Per Person Breakdown:</div>
+    <div id="perAdult" style="font-weight:800;font-size:14px; color:#e10600">Adult: PKR 0</div>
+    <div id="perChild" style="font-weight:600;font-size:13px; color:#666">Child: PKR 0</div>
+    <div id="perInfant" style="font-weight:600;font-size:13px; color:#666">Infant: PKR 0</div>
+  </div>
+</div>
+
+      <button class="btn" id="calcBtn">Calculate Grand Total</button>
+    </div>
+
+    <footer class="page-footer">
+      <div style="color:#000000">This tool is powered by <strong style="color:var(--brand-red)">GroTech Solutions</strong></div>
+    </footer>
+  </div>
+
+  <!-- ===== JS Logic ===== -->
+  <script>
+    /******************************************************************
+ * CONFIG: rates & ROE (edit here when you want to change defaults)
+ * TICKET prices are now in PKR (direct amounts)
+ * Hotel, Transport, Visa prices are in SAR (will be converted via ROE)
+ ******************************************************************/
+const CONFIG = {
+  roe: 78, // SAR -> PKR (edit in code to change)
+  
+  // ticket PKR rates (DIRECT amounts, no conversion needed):
+  tickets: {
+    adult: 0, 
+    child: 0,   
+    infant: 0 
+  },
+  
+   // MAKKAH HOTELS - Updated with real data
+  makkahHotels: [
+    { id:'MAK01', name:'ABDULLAH GHAMAS MAKKAH', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK02', name:'AL DANA MAKKAH', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK03', name:'ANJUM HOTEL', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK04', name:'AREEJ AL FALAH', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK05', name:'AREEJ AL ZAHBI (500 METER) |AL HIJRAH', rates: { hexa:45, quint:45, quad:51, triple:68, double:100 } },
+    { id:'MAK06', name:'ASALAT MAKKAH', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK07', name:'BADAR AL MASA (600 METER) |IBRAHIM KHALIL', rates: { hexa:100, quint:58, quad:66, triple:87, double:130 } },
+    { id:'MAK08', name:'BISAN AL HIJRA/FUNDUQ JAFRIA', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK09', name:'DHAIF AL AZIZIYAH (400 METER) |AJYAD STREET', rates: { hexa:100, quint:55, quad:62, triple:82, double:122 } },
+    { id:'MAK10', name:'DIWAN AL BAIT (600 METER) |IBRAHIM KHALIL', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK11', name:'EMAAR AL KHALIL', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK12', name:'EMAAR INDOLUSIA', rates: { hexa:250, quint:250, quad:250, triple:250, double:250 } },
+    { id:'MAK13', name:'EMAAR SULTAN', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK14', name:'FAIRMONT CLOCK TOWER', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK15', name:'FAKHIR AL AZIZIA WITH SHUTTLE SERVICE |AZIZIA MAKKAH', rates: { hexa:18, quint:18, quad:21, triple:27, double:40 } },
+    { id:'MAK16', name:'FUNDUQ BILAL', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK17', name:'GALA AL TAJ', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK18', name:'HIDAYA TOWER', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK19', name:'KISWAH TOWER WITH SHUTTLE SERVICE |AL TAYSIR ROAD', rates: { hexa:30, quint:29, quad:35, triple:45, double:65 } },
+    { id:'MAK20', name:'LAND PREMIUM (1000 METER) |MISFILLAH KUBRI', rates: { hexa:32, quint:32, quad:36, triple:48, double:72 } },
+    { id:'MAK21', name:'LE MERIDIAN TOWER', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK22', name:'M MILLINIUM HOTEL', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK23', name:'MAKKAH TOWER', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK24', name:'MARSA AL JARIYA', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK25', name:'MATHER AL JAWAR', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK26', name:'MAYAR MAYASSAR', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK27', name:'MELLA 1 (700 METER) |IBRAHIM KHALIL', rates: { hexa:90, quint:90, quad:45, triple:60, double:90 } },
+    { id:'MAK28', name:'MELLA 2 (700 METER) |IBRAHIM KHALIL', rates: { hexa:40, quint:40, quad:45, triple:60, double:90 } },
+    { id:'MAK29', name:'MIAAD AL MAJD (800 METER) |AL HIJRA ROAD', rates: { hexa:34, quint:34, quad:39, triple:51, double:76 } },
+    { id:'MAK30', name:'NADA AL JAWHARAH', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK31', name:'NADA AL MAJD', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK32', name:'NAWARA SHAMS 3 (300 METER) |IBRAHIM KHALIL', rates: { hexa:250, quint:330, quad:300, triple:300, double:300 } },
+    { id:'MAK33', name:'NAWARAT AL SHAMS 3', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK34', name:'OLYAN ROYAL', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK35', name:'QILA AJYAD WITH SHUTTLE SERVICE |AJYAD STREET', rates: { hexa:24, quint:24, quad:27, triple:36, double:54 } },
+    { id:'MAK36', name:'SADAN AL HUDA', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK37', name:'SAFWA TOWER 3', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK38', name:'SAIF AL MAJD (600 METER) |AL HIJRAH', rates: { hexa:42, quint:42, quad:48, triple:64, double:95 } },
+    { id:'MAK39', name:'SAJA MAKKAH', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK40', name:'SHAMS AL ZAHBI (400 METER) |AL HIJRAH', rates: { hexa:55, quint:55, quad:62, triple:82, double:122 } },
+    { id:'MAK41', name:'SWISS AL MAQAM', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK42', name:'TARA AL-HIJRA', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK43', name:'TARA KHALIL', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK44', name:'THAT HOTEL (900 METER) |MISFILLAH KUBRI', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK45', name:'TOUHEED ASALA MAKKAH', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAK46', name:'JADDA AL KHALIL', rates: { hexa:150, quint:175, quad:200, triple:225, double:250 } },
+    { id:'MAK47', name:'VOCO MAKKAH WITH SHUTTLE SERVICE |IBRAHIM KHALIL', rates: { hexa:250, quint:200, quad:180, triple:68, double:102 } },
+    { id:'MAK48', name:'ZILAL UL NAZALA', rates: { hexa:250, quint:200, quad:180, triple:300, double:102 } },
+  ],
+
+  // MADINAH HOTELS - Updated with real data
+  madinahHotels: [
+    { id:'MAD01', name:'AL AQEEQ MADINA', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD02', name:'AL SAFA CENTER (750 METER) |MASJID BILAL', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD03', name:'ANWAR AL MADINAH MOVENPICK', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD04', name:'ARAEK TAIBA', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD05', name:'ATHAR TAIBA', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD06', name:'BIR UL EIMAN 250 METER|SOUTH MARKAZIA', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD07', name:'BURAQ GOLDEN', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD08', name:'BURJ MUKHTARA (350 METER) |BAB AL SALAM ROAD', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD09', name:'DALLAH TAIBA MADINAH', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD10', name:'DAR AL NAEEM', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD11', name:'DIYAFA MUKHTARA', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD12', name:'ELAF QUBA', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD13', name:'ERGWAN AL MADINAH', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD14', name:'FUNDAQ AL RAYYAN WITH SHUTTLE SERVICE |ABDUL AZIZ ROAD', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD15', name:'GRAND PLAZA AL MADINAH', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD16', name:'GRAND PLAZA BADAR ALMAQAM', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD17', name:'GULNAR TAIBA', rates: { hexa:100, quint:500, quad:100, triple:100, double:100 } },
+    { id:'MAD18', name:'HALA TAIBAH WITH SHUTTLE SERVICE |ABDUL AZIZ ROAD', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD19', name:'HAMOUDA ZAHBI (500 METER) |MASJID BILAL', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD20', name:'KARAM SILVER', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD21', name:'KAYAN INTERNATIONAL', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD22', name:'LEADER AL MUNA KAREEM', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD23', name:'MADINA GOLDEN', rates: { hexa:100, quint:100, quad:350, triple:100, double:100 } },
+    { id:'MAD24', name:'MANAR AL EIMAN', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD25', name:'MANAZIL MARJAN WITH SHUTTLE SERVICE |QURBAN NAZIL RD', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD26', name:'MARJAN GOLDEN (100 METER) |GHARBIA', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD27', name:'MARSA SILVER', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD28', name:'MIRAGE AL-SALAM', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD29', name:'MUKHTARA INTERNATIONAL', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD30', name:'NAJOOM AL MADINAH (500 METER) |QUBA ROAD', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD31', name:'NUSK AL EIMAN', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD32', name:'NUZUL AL FALAH (450 METER) |AL BIAK OPPOSITE', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD33', name:'ODST HOTEL', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD34', name:'PARADISE', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD35', name:'RAMA AL MADINAH (100 METER) |SOUTH MARKAZIA', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD36', name:'RAWDA AL SAFWA', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD37', name:'RUA AL HIJRA', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD38', name:'SAFWAT AL MADINA', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD39', name:'SARAYA HARMONY', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD40', name:'SKY VIEW', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD41', name:'TAIBA FRONT', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD42', name:'TAIBA MADINAH', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD43', name:'TAIF NEBRAS 250 METER|SOUTH MARKAZIA', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD44', name:'TAJ WARD', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD45', name:'VERTA AL MADINAH (300 METER) |MUAWIYAH ROAD', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD46', name:'WAHAT AL SHARK (750 METER) |MASJID BILAL', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD47', name:'WARDA SAFA (250 M)|SOUTH MARKAZIA', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD48', name:'WISAM MISK', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } },
+    { id:'MAD49', name:'ZAHRA MUNAWARAH', rates: { hexa:100, quint:100, quad:100, triple:100, double:100 } }
+  ],
+
+// TRANSPORT OPTIONS - Organized by Route then Vehicle
+transportOptions: [
+  { 
+    route: 'JED APT-MAK HTL-MED HTL-MAK HTL-JED APT',
+    displayName: 'Jeddah Airport → Makkah Hotel → Madina Hotel → Makkah Hotel → Jeddah Airport',
+    vehicles: [
+      { id:'TR1', name:'Car', rateSAR:1485 },
+      { id:'TR2', name:'H1', rateSAR:1700 },
+      { id:'TR3', name:'GMC', rateSAR:2635 },
+      { id:'TR4', name:'Bus', rateSAR:4180 },
+      { id:'TR5', name:'Hiace', rateSAR:2030 },
+      { id:'TR6', name:'Coaster', rateSAR:2365 }
+    ]
+  },
+  { 
+    route: 'JED APT-MAK HTL-MED HTL-MED APT',
+    displayName: 'Jeddah Airport → Makkah Hotel → Madina Hotel → Madina Airport',
+    vehicles: [
+      { id:'TR7', name:'Car', rateSAR:945 },
+      { id:'TR8', name:'H1', rateSAR:1085 },
+      { id:'TR9', name:'GMC', rateSAR:1625 },
+      { id:'TR10', name:'Bus', rateSAR:2140 },
+      { id:'TR11', name:'Hiace', rateSAR:1325 },
+      { id:'TR12', name:'Coaster', rateSAR:2205 }
+    ]
+  },
+  { 
+    route: 'MED APT-MED HTL- MAK HTL-JED APT', 
+    displayName: 'Madina Airport → Madina Hotel → Makkah Hotel → Jeddah Airport',
+    vehicles: [
+      { id:'TR13', name:'Car', rateSAR:920 },
+      { id:'TR14', name:'H1', rateSAR:1055 },
+      { id:'TR15', name:'GMC', rateSAR:1600 },
+      { id:'TR16', name:'Bus', rateSAR:2040 },
+      { id:'TR17', name:'Hiace', rateSAR:1295 },
+      { id:'TR18', name:'Coaster', rateSAR:1080 }
+    ]
+  },
+  { 
+    route: 'JED APT-MAK HTL',
+    displayName: 'Jeddah Airport → Makkah Hotel',
+    vehicles: [
+      { id:'TR1', name:'Car', rateSAR:295 },
+      { id:'TR2', name:'H1', rateSAR:350 },
+      { id:'TR3', name:'GMC', rateSAR:430 },
+      { id:'TR4', name:'Bus', rateSAR:770 },
+      { id:'TR5', name:'Hiace', rateSAR:405 },
+      { id:'TR6', name:'Coaster', rateSAR:680 }
+    ]
+  }
+],
+  // visa/ziyarat SAR defaults (will be converted via ROE)
+  visaSAR: 780,
+  ziyarahSAR: 25
+};
+/******************************************************************
+ * Date Validation Helper - Prevent checkout before checkin
+ ******************************************************************/
+function setupDateValidation(checkinInput, checkoutInput) {
+  // Set min date for checkout when checkin changes
+  checkinInput.addEventListener('change', function() {
+    if (this.value) {
+      checkoutInput.min = this.value;
+      
+      // If checkout date is before new checkin date, clear it
+      if (checkoutInput.value && checkoutInput.value < this.value) {
+        checkoutInput.value = '';
+        // Trigger nights recalculation
+        const event = new Event('change');
+        checkoutInput.dispatchEvent(event);
+      }
+    }
+  });
+
+  // Also set initial min date if checkin already has a value
+  if (checkinInput.value) {
+    checkoutInput.min = checkinInput.value;
+  }
+}
+    /******************************************************************
+     * Utility helpers
+     ******************************************************************/
+    function toPKR(sar) {
+      return Math.round(sar * CONFIG.roe);
+    }
+    function formatPKR(num) {
+      return 'PKR ' + (Number(num) || 0).toLocaleString();
+    }
+    function parseDateInput(val) {
+      // returns Date or null
+      if(!val) return null;
+      const d = new Date(val + 'T00:00:00');
+      return isNaN(d.getTime()) ? null : d;
+    }
+    function nightsBetween(checkInStr, checkOutStr) {
+      const inD = parseDateInput(checkInStr);
+      const outD = parseDateInput(checkOutStr);
+      if(!inD || !outD) return 0;
+      // difference in days
+      const diff = Math.ceil((outD - inD) / (1000*60*60*24));
+      return diff > 0 ? diff : 0;
+    }
+
+    /******************************************************************
+ * Initialize UI readonly fields from CONFIG
+ ******************************************************************/
+document.getElementById('roeInput').value = CONFIG.roe;
+document.getElementById('adultPriceSAR').value = CONFIG.tickets.adult;
+document.getElementById('childPriceSAR').value = CONFIG.tickets.child;
+document.getElementById('infantPriceSAR').value = CONFIG.tickets.infant;
+document.getElementById('visaSAR').value = CONFIG.visaSAR;
+document.getElementById('ziyaratSAR').value = CONFIG.ziyarahSAR;
+
+    /******************************************************************
+     * Render helpers for hotel/transport blocks
+     ******************************************************************/
+    function createHotelBlock(city, index, hotelList) {
+      // city = 'makkah' or 'madinah'
+      const container = document.createElement('div');
+      container.className = 'hotel-block';
+      container.style.border = '1px solid #eee';
+      container.style.padding = '12px';
+      container.style.borderRadius = '10px';
+      container.style.marginTop = '12px';
+
+      // markup inside
+      container.innerHTML = `
+        <div class="grid-2" style="gap:12px">
+    <div>
+      <label>Hotel</label>
+      <select class="hotel-select"></select>
+    </div>
+    <div>
+      <label>Room Type</label>
+      <select class="room-select">
+        <option value="hexa">Hexa</option>
+        <option value="quint">Quint</option>
+        <option value="quad">Quad</option>
+        <option value="triple">Triple</option>
+        <option value="double">Double</option>
+      </select>
+    </div>
+  </div>
+
+        <div class="grid-3" style="margin-top:10px">
+          <div>
+            <label>Check-in</label>
+            <input type="date" class="checkin">
+          </div>
+          <div>
+            <label>Check-out</label>
+            <input type="date" class="checkout">
+          </div>
+          <div>
+            <label>No. of Rooms</label>
+            <input type="number" class="no-rooms" value="1" min="1">
+          </div>
+        </div>
+
+        <div class="grid-3" style="margin-top:10px">
+          <div>
+            <label>Nights</label>
+            <input type="number" class="nights" readonly>
+          </div>
+          <div>
+            <label>Rate (SAR / night)</label>
+            <input type="number" class="rate-sar" readonly>
+          </div>
+          <div>
+            <label>Total (PKR)</label>
+            <input type="text" class="hotel-total-pkr" readonly>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
+          <button type="button" class="btn small-btn recalc">Recalculate</button>
+          <button type="button" class="btn small-btn" style="background:#444" class="remove">Remove</button>
+        </div>
+      `;
+
+      // populate hotel-select
+      const hotelSelect = container.querySelector('.hotel-select');
+      hotelList.forEach(h => {
+        const opt = document.createElement('option');
+        opt.value = h.id;
+        opt.textContent = h.name;
+        hotelSelect.appendChild(opt);
+      });
+
+      // when hotel or room-type changes, update rate field
+      function updateRateFromSelection() {
+        const selHotelId = hotelSelect.value;
+        const roomType = container.querySelector('.room-select').value;
+        const hotelObj = hotelList.find(h => h.id === selHotelId);
+        const rate = hotelObj ? (hotelObj.rates[roomType] || 0) : 0;
+        container.querySelector('.rate-sar').value = rate;
+      }
+
+      hotelSelect.addEventListener('change', updateRateFromSelection);
+      container.querySelector('.room-select').addEventListener('change', updateRateFromSelection);
+
+      // calculate nights on date change
+function updateNights() {
+  const inVal = container.querySelector('.checkin').value;
+  const outVal = container.querySelector('.checkout').value;
+  const nights = nightsBetween(inVal, outVal);
+  container.querySelector('.nights').value = nights;
+}
+
+// Get the date inputs
+const checkinInput = container.querySelector('.checkin');
+const checkoutInput = container.querySelector('.checkout');
+
+// Add date validation
+checkinInput.addEventListener('change', updateNights);
+checkoutInput.addEventListener('change', updateNights);
+
+// Setup date validation to prevent checkout before checkin
+setupDateValidation(checkinInput, checkoutInput);
+
+      // recalc button computes total for this block
+      container.querySelector('.recalc').addEventListener('click', function(){
+        updateRateFromSelection();
+        updateNights();
+        const nights = parseInt(container.querySelector('.nights').value) || 0;
+        const rooms = parseInt(container.querySelector('.no-rooms').value) || 0;
+        const rateSAR = parseFloat(container.querySelector('.rate-sar').value) || 0;
+        const totalSAR = nights * rateSAR * rooms;
+        const totalPKR = totalSAR * CONFIG.roe;
+        container.querySelector('.hotel-total-pkr').value = formatPKR(totalPKR);
+        updateAllSubtotals(); // update section subtotals & summaries
+      });
+
+      // remove button
+      const removeBtn = container.querySelectorAll('button')[1];
+      removeBtn.addEventListener('click', function(){
+        container.remove();
+        updateAllSubtotals();
+      });
+
+      // initialize rate
+      updateRateFromSelection();
+
+      return container;
+    }
+
+function createTransportBlock() {
+  const wrapper = document.createElement('div');
+  wrapper.style.border = '1px solid #eee';
+  wrapper.style.padding = '12px';
+  wrapper.style.borderRadius = '10px';
+  wrapper.style.marginTop = '12px';
+  
+  // CORRECTED HTML TEMPLATE - Complete and properly closed
+  wrapper.innerHTML = `
+    <div class="grid-2">
+      <div>
+        <label>Transport Route</label>
+        <select class="transport-route-select"></select>
+      </div>
+      <div>
+        <label>Vehicle Type</label>
+        <select class="transport-vehicle-select"></select>
+      </div>
+    </div>
+    <!-- ADD THIS NEW ROW FOR QUANTITY -->
+    <div class="grid-2" style="margin-top:10px">
+      <div>
+        <label>Quantity</label>
+        <input type="number" class="transport-qty" value="0" min="0">
+      </div>
+      <div>
+        <!-- Empty for alignment -->
+      </div>
+    </div>
+    <div class="grid-3" style="margin-top:10px">
+      <div>
+        <label>Rate (SAR)</label>
+        <input type="number" class="transport-rate" readonly>
+      </div>
+      <div>
+        <label>ROE</label>
+        <input type="number" class="transport-roe" readonly>
+      </div>
+      <div>
+        <label>Total (PKR)</label>
+        <input type="text" class="transport-total-pkr" readonly>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn small-btn transport-recalc" type="button">Recalculate</button>
+      <button class="btn small-btn" style="background:#444">Remove</button>
+    </div>
+  `;
+
+  const routeSelect = wrapper.querySelector('.transport-route-select');
+  const vehicleSelect = wrapper.querySelector('.transport-vehicle-select');
+  
+  // Populate routes
+  CONFIG.transportOptions.forEach(route => {
+    const option = document.createElement('option');
+    option.value = route.route;
+    option.textContent = route.displayName;
+    routeSelect.appendChild(option);
+  });
+
+function updateVehicleOptions() {
+  const selectedRoute = routeSelect.value;
+  const routeObj = CONFIG.transportOptions.find(r => r.route === selectedRoute);
+  
+  // Clear existing vehicle options
+  vehicleSelect.innerHTML = '';
+  
+  if (routeObj) {
+    routeObj.vehicles.forEach(vehicle => {
+      const option = document.createElement('option');
+      option.value = vehicle.id;
+      // CHANGE THIS LINE - Remove " - SAR ${vehicle.rateSAR}" part
+      option.textContent = vehicle.name;  // Only show vehicle name
+      vehicleSelect.appendChild(option);
+    });
+  }
+  
+  updateRate();
+}
+
+  function updateRate() {
+    const selectedRoute = routeSelect.value;
+    const selectedVehicleId = vehicleSelect.value;
+    const routeObj = CONFIG.transportOptions.find(r => r.route === selectedRoute);
+    
+    if (routeObj) {
+      const vehicleObj = routeObj.vehicles.find(v => v.id === selectedVehicleId);
+      wrapper.querySelector('.transport-rate').value = vehicleObj ? vehicleObj.rateSAR : 0;
+    } else {
+      wrapper.querySelector('.transport-rate').value = 0;
+    }
+    
+    wrapper.querySelector('.transport-roe').value = CONFIG.roe;
+  }
+
+  routeSelect.addEventListener('change', updateVehicleOptions);
+  vehicleSelect.addEventListener('change', updateRate);
+
+  wrapper.querySelector('.transport-recalc').addEventListener('click', function(){
+    updateRate();
+    const qty = parseInt(wrapper.querySelector('.transport-qty').value) || 0;
+    const rateSAR = parseFloat(wrapper.querySelector('.transport-rate').value) || 0;
+    const totalPKR = qty * rateSAR * CONFIG.roe;
+    wrapper.querySelector('.transport-total-pkr').value = formatPKR(totalPKR);
+    updateAllSubtotals();
+  });
+
+  // remove
+  wrapper.querySelectorAll('button')[1].addEventListener('click', function(){
+    wrapper.remove();
+    updateAllSubtotals();
+  });
+
+  // Initialize
+  updateVehicleOptions();
+  return wrapper;
+}
+
+    /******************************************************************
+     * Attach add/remove handlers
+     ******************************************************************/
+    const makkahList = document.getElementById('makkahList');
+    const madinahList = document.getElementById('madinahList');
+    const transportList = document.getElementById('transportList');
+
+    document.getElementById('addMakkahBtn').addEventListener('click', function(){
+      const block = createHotelBlock('makkah', makkahList.children.length, CONFIG.makkahHotels);
+      makkahList.appendChild(block);
+    });
+    document.getElementById('addMadinahBtn').addEventListener('click', function(){
+      const block = createHotelBlock('madinah', madinahList.children.length, CONFIG.madinahHotels);
+      madinahList.appendChild(block);
+    });
+    document.getElementById('addTransportBtn').addEventListener('click', function(){
+      const t = createTransportBlock();
+      transportList.appendChild(t);
+    });
+
+    document.getElementById('clearMakkahBtn').addEventListener('click', function(){
+      makkahList.innerHTML = ''; updateAllSubtotals();
+    });
+    document.getElementById('clearMadinahBtn').addEventListener('click', function(){
+      madinahList.innerHTML = ''; updateAllSubtotals();
+    });
+    document.getElementById('clearTransportBtn').addEventListener('click', function(){
+      transportList.innerHTML = ''; updateAllSubtotals();
+    });
+   /******************************************************************
+ * Calculation routines for subtotals and summary - FIXED VERSION
+ ******************************************************************/
+function computeTicketsTotalPKR() {
+  // DIRECT PKR CALCULATION - NO ROE CONVERSION
+  const adultPKR = parseFloat(document.getElementById('adultPriceSAR').value) || 0;
+  const childPKR = parseFloat(document.getElementById('childPriceSAR').value) || 0;
+  const infantPKR = parseFloat(document.getElementById('infantPriceSAR').value) || 0;
+
+  const adults = parseInt(document.getElementById('noAdults').value) || 0;
+  const children = parseInt(document.getElementById('noChildren').value) || 0;
+  const infants = parseInt(document.getElementById('noInfants').value) || 0;
+
+  const totalPKR = (adultPKR * adults) + (childPKR * children) + (infantPKR * infants);
+  
+  return { 
+    totalPKR, 
+    breakdown: {
+      adultPKR: adultPKR * adults, 
+      childPKR: childPKR * children, 
+      infantPKR: infantPKR * infants
+    } 
+  };
+}
+
+function computeHotelsTotalPKR(listContainer) {
+  // SAR → PKR CONVERSION
+  let totalPKR = 0;
+  for(const node of listContainer.children) {
+    const nights = parseInt(node.querySelector('.nights').value) || 0;
+    const rooms = parseInt(node.querySelector('.no-rooms').value) || 0;
+    const rateSAR = parseFloat(node.querySelector('.rate-sar').value) || 0;
+    const blockTotalSAR = nights * rooms * rateSAR;
+    const blockTotalPKR = blockTotalSAR * CONFIG.roe; // CONVERT HERE
+    node.querySelector('.hotel-total-pkr').value = formatPKR(blockTotalPKR);
+    totalPKR += blockTotalPKR;
+  }
+  return totalPKR;
+}
+
+function computeTransportTotalPKR(listContainer) {
+  // SAR → PKR CONVERSION
+  let totalPKR = 0;
+  for(const node of listContainer.children) {
+    const qty = parseInt(node.querySelector('.transport-qty').value) || 0;
+    const rateSAR = parseFloat(node.querySelector('.transport-rate').value) || 0;
+    const blockTotalPKR = qty * rateSAR * CONFIG.roe; // CONVERT HERE
+    node.querySelector('.transport-total-pkr').value = formatPKR(blockTotalPKR);
+    totalPKR += blockTotalPKR;
+  }
+  return totalPKR;
+}
+
+function computeVisaTotalPKR() {
+  // SAR → PKR CONVERSION
+  const visaSAR = parseFloat(document.getElementById('visaSAR').value) || 0;
+  const ziyarahSAR = parseFloat(document.getElementById('ziyaratSAR').value) || 0;
+  const applicants = parseInt(document.getElementById('noApplicants').value) || 0;
+  const totalSAR = (visaSAR + ziyarahSAR) * applicants;
+  const totalPKR = totalSAR * CONFIG.roe; // CONVERT HERE
+  return { totalSAR, totalPKR };
+}
+
+    function updateAllSubtotals() {
+      // Tickets
+      const t = computeTicketsTotalPKR();
+      document.getElementById('ticketsSubtotal')?.remove?.(); // old (if any)
+      const ticketDiv = document.getElementById('ticketsSubtotal') || document.createElement('div');
+      ticketDiv.id = 'ticketsSubtotal';
+      ticketDiv.className = 'sub-total';
+      ticketDiv.style.display = 'block';
+      ticketDiv.innerHTML = `🎟️ Tickets: ${formatPKR(t.totalPKR)} (Adult: ${formatPKR(t.breakdown.adultPKR)}, Child: ${formatPKR(t.breakdown.childPKR)}, Infant: ${formatPKR(t.breakdown.infantPKR)})`;
+
+
+      // replace if not present under first card
+      const firstCard = document.querySelector('#calculatorCard');
+      if(!firstCard.querySelector('#ticketsSubtotal')) firstCard.appendChild(ticketDiv);
+
+      // Hotels Makkah
+      const makkahTotal = computeHotelsTotalPKR(makkahList);
+      const makkahDiv = document.getElementById('makkahSubtotal') || document.createElement('div');
+      makkahDiv.id = 'makkahSubtotal'; makkahDiv.className = 'sub-total'; makkahDiv.style.display='block';
+      makkahDiv.innerHTML = `🏨 Makkah Hotels: ${formatPKR(makkahTotal)}`;
+      const mCard = document.getElementById('makkahCard');
+      if(!mCard.querySelector('#makkahSubtotal')) mCard.appendChild(makkahDiv);
+
+      // Hotels Madinah
+      const madinahTotal = computeHotelsTotalPKR(madinahList);
+      const madinahDiv = document.getElementById('madinahSubtotal') || document.createElement('div');
+      madinahDiv.id = 'madinahSubtotal'; madinahDiv.className = 'sub-total'; madinahDiv.style.display='block';
+      madinahDiv.innerHTML = `🏨 Madinah Hotels: ${formatPKR(madinahTotal)}`;
+      const mdCard = document.getElementById('madinahCard');
+      if(!mdCard.querySelector('#madinahSubtotal')) mdCard.appendChild(madinahDiv);
+
+      // Transport
+      const transportTotal = computeTransportTotalPKR(transportList);
+      const transportDiv = document.getElementById('transportSubtotal') || document.createElement('div');
+      transportDiv.id='transportSubtotal'; transportDiv.className='sub-total'; transportDiv.style.display='block';
+      transportDiv.innerHTML = `🚗 Transport: ${formatPKR(transportTotal)}`;
+      const trCard = document.getElementById('transportCard');
+      if(!trCard.querySelector('#transportSubtotal')) trCard.appendChild(transportDiv);
+
+      // Visa
+      const visaObj = computeVisaTotalPKR();
+      const visaDiv = document.getElementById('visaSubtotal') || document.createElement('div');
+      visaDiv.id='visaSubtotal'; visaDiv.className='sub-total'; visaDiv.style.display='block';
+      visaDiv.innerHTML = `🛂 Visa & Ziyarat: ${formatPKR(visaObj.totalPKR)}`;
+      const vCard = document.getElementById('visaCard');
+      if(!vCard.querySelector('#visaSubtotal')) vCard.appendChild(visaDiv);
+
+      // Update summary boxes
+      document.getElementById('summaryTickets').textContent = formatPKR(t.totalPKR);
+      const hotelsTotal = makkahTotal + madinahTotal;
+      document.getElementById('summaryHotels').textContent = formatPKR(hotelsTotal);
+      document.getElementById('summaryTransport').textContent = formatPKR(transportTotal);
+      document.getElementById('summaryVisa').textContent = formatPKR(visaObj.totalPKR);
+
+const grand = t.totalPKR + hotelsTotal + transportTotal + visaObj.totalPKR;
+document.getElementById('grandTotal').textContent = formatPKR(grand);
+
+// NEW: Calculate per person breakdown
+const adults = parseInt(document.getElementById('noAdults').value) || 0;
+const children = parseInt(document.getElementById('noChildren').value) || 0;
+const infants = parseInt(document.getElementById('noInfants').value) || 0;
+const applicants = parseInt(document.getElementById('noApplicants').value) || 0;
+
+// Get individual costs
+const adultTicketPKR = parseFloat(document.getElementById('adultPriceSAR').value) || 0;
+const childTicketPKR = parseFloat(document.getElementById('childPriceSAR').value) || 0;
+const infantTicketPKR = parseFloat(document.getElementById('infantPriceSAR').value) || 0;
+
+// Calculate visa costs only if applicable
+const includeZiyarat = document.getElementById('includeZiyarat').checked;
+const visaSAR = parseFloat(document.getElementById('visaSAR').value) || 0;
+const ziyaratSAR = includeZiyarat ? (parseFloat(document.getElementById('ziyaratSAR').value) || 0) : 0;
+const totalVisaPKR = (visaSAR + ziyaratSAR) * CONFIG.roe;
+
+// Only add visa costs if there are applicants
+const effectiveVisaPKR = (applicants > 0) ? totalVisaPKR : 0;
+
+// Calculate shares (hotels & transport divided only among adults)
+const hotelsPerAdult = adults > 0 ? hotelsTotal / adults : 0;
+const transportPerAdult = adults > 0 ? transportTotal / adults : 0;
+
+// Per person costs - USE effectiveVisaPKR
+const perAdult = Math.round(adultTicketPKR + hotelsPerAdult + transportPerAdult + effectiveVisaPKR);
+const perChild = Math.round(childTicketPKR + effectiveVisaPKR);
+const perInfant = Math.round(infantTicketPKR + effectiveVisaPKR);
+
+// Update display - ONLY SHOW LINES THAT HAVE PASSENGERS
+document.getElementById('perAdult').textContent = `Adult: ${formatPKR(perAdult)}`;
+
+
+
+// Only show child line if there are children
+const perChildElement = document.getElementById('perChild');
+if (children > 0) {
+    perChildElement.textContent = `Child: ${formatPKR(perChild)}`;
+    perChildElement.style.display = 'block';
+} else {
+    perChildElement.style.display = 'none';
+}
+
+// Only show infant line if there are infants
+const perInfantElement = document.getElementById('perInfant');
+if (infants > 0) {
+    perInfantElement.textContent = `Infant: ${formatPKR(perInfant)}`;
+    perInfantElement.style.display = 'block';
+} else {
+    perInfantElement.style.display = 'none';
+}
+    }
+    /******************************************************************
+     * Calculate Tickets Only Button
+     ******************************************************************/
+    document.getElementById('calcTicketsBtn').addEventListener('click', function(){
+      const t = computeTicketsTotalPKR();
+      const ticketDiv = document.getElementById('ticketsSubtotal') || document.createElement('div');
+      ticketDiv.id = 'ticketsSubtotal';
+      ticketDiv.className = 'sub-total';
+      ticketDiv.style.display = 'block';
+      ticketDiv.innerHTML = `🎟️ Tickets: ${formatPKR(t.totalPKR)} (Adult: ${formatPKR(t.breakdown.adultPKR)}, Child: ${formatPKR(t.breakdown.childPKR)}, Infant: ${formatPKR(t.breakdown.infantPKR)})`;
+      
+      const firstCard = document.querySelector('#calculatorCard');
+      if(!firstCard.querySelector('#ticketsSubtotal')) firstCard.appendChild(ticketDiv);
+      
+      // Also update the summary box for tickets
+      document.getElementById('summaryTickets').textContent = formatPKR(t.totalPKR);
+    });
+        /******************************************************************
+     * Auto-calculate tickets when passenger numbers change
+     ******************************************************************/
+    document.getElementById('noAdults').addEventListener('input', function(){
+      document.getElementById('calcTicketsBtn').click();
+    });
+    document.getElementById('noChildren').addEventListener('input', function(){
+      document.getElementById('calcTicketsBtn').click();
+    });
+    document.getElementById('noInfants').addEventListener('input', function(){
+      document.getElementById('calcTicketsBtn').click();
+    });
+        /******************************************************************
+     * Calculate Visa & Ziyarat Only Button
+     ******************************************************************/
+    document.getElementById('calcVisaBtn').addEventListener('click', function(){
+      const visaObj = computeVisaTotalPKR();
+      const visaDiv = document.getElementById('visaSubtotal') || document.createElement('div');
+      visaDiv.id = 'visaSubtotal';
+      visaDiv.className = 'sub-total';
+      visaDiv.style.display = 'block';
+      visaDiv.innerHTML = `🛂 Visa & Ziyarat: ${formatPKR(visaObj.totalPKR)} (${document.getElementById('noApplicants').value} applicants × SAR ${document.getElementById('visaSAR').value}${document.getElementById('includeZiyarat').checked ? ' + ' + document.getElementById('ziyaratSAR').value : ''})`;
+      
+      const vCard = document.getElementById('visaCard');
+      if(!vCard.querySelector('#visaSubtotal')) vCard.appendChild(visaDiv);
+      
+      // Also update the summary box for visa
+      document.getElementById('summaryVisa').textContent = formatPKR(visaObj.totalPKR);
+    });
+
+    /******************************************************************
+     * Auto-calculate visa when applicant number changes
+     ******************************************************************/
+    document.getElementById('noApplicants').addEventListener('input', function(){
+      document.getElementById('calcVisaBtn').click();
+    });
+        /******************************************************************
+     * Ziyarat Checkbox Handler
+     ******************************************************************/
+    document.getElementById('includeZiyarat').addEventListener('change', function(){
+      const ziyaratCheckbox = document.getElementById('includeZiyarat');
+      const ziyaratAmount = document.getElementById('ziyaratAmount');
+      
+      if(ziyaratCheckbox.checked) {
+        document.getElementById('ziyaratSAR').value = CONFIG.ziyarahSAR;
+        ziyaratAmount.textContent = CONFIG.ziyarahSAR;
+      } else {
+        document.getElementById('ziyaratSAR').value = 0;
+        ziyaratAmount.textContent = '0';
+      }
+      
+      // Auto-calculate when checkbox changes
+      document.getElementById('calcVisaBtn').click();
+    });
+
+    // calculate button event
+    document.getElementById('calcBtn').addEventListener('click', function(){
+      // Ensure each block recalculates
+      // trigger recalc on all hotel and transport blocks
+      for(const node of makkahList.children){
+        const btn = node.querySelector('.recalc');
+        if(btn) btn.click();
+      }
+      for(const node of madinahList.children){
+        const btn = node.querySelector('.recalc');
+        if(btn) btn.click();
+      }
+      for(const node of transportList.children){
+        const btn = node.querySelector('.transport-recalc');
+        if(btn) btn.click();
+      }
+      // compute tickets & visa too
+      updateAllSubtotals();
+      // scroll to summary
+      document.getElementById('grandTotal').scrollIntoView({behavior:'smooth', block:'center'});
+    });
+
+    // initialize: add one block per city and one transport sample
+    (function init(){
+      // add default hotel blocks
+      document.getElementById('addMakkahBtn').click();
+      document.getElementById('addMadinahBtn').click();
+      document.getElementById('addTransportBtn').click();
+      // prefill some dates to show nights example (optional)
+      // set default dates for first blocks (if exist)
+      setTimeout(()=> updateAllSubtotals(), 100);
+    })();
+  </script>
+</body>
+</html>

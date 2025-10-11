@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trip Again Pvt Ltd - Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
+
+
+    <style>
+      #starfield {
+  position: fixed;
+  inset: 0; /* top:0;left:0;right:0;bottom:0; */
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  display: block;
+  pointer-events: none;
+  background: transparent;
+}
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+body {
+    background: linear-gradient(135deg, #000000, #1a1a1a, #330000);
+    background-size: 400% 400%;
+    animation: gradientMove 12s ease infinite;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    overflow-x: hidden;
+}
+
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+        }
+
+.brand-section {
+    position: relative;
+    text-align: center;
+    margin-bottom: 40px;
+    cursor: pointer;
+    transition: all 0.5s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+ .brand-section:hover {
+            transform: translateY(-5px);
+        }
+
+.brand-logo {
+  width: 160px;
+  height: 160px;
+  margin: 0 auto 20px;
+  background-image: url('logo.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 0 25px rgba(182, 182, 182, 0.8));
+  margin-bottom: -15px;
+}
+.brand-logo::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 0, 0, 0.151), transparent 70%);
+    transform: translate(-50%, -50%);
+    filter: blur(05px);
+    animation: logoGlow 4s ease-in-out infinite alternate;
+    z-index: -1;
+}
+
+@keyframes logoGlow {
+    from { opacity: 0.4; transform: translate(-50%, -50%) scale(1); }
+    to { opacity: 0.8; transform: translate(-50%, -50%) scale(1.1); }
+}
+
+.brand-name {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 4rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  letter-spacing: 2.5px;
+  text-shadow: 0 0 10px rgba(255, 77, 77, 0.4);
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+
+  /* Default: Dark theme style */
+  color: #ffffff;
+}
+.brand-tagline {
+  font-size: 1rem;
+  color: #aaaaaa;
+  font-weight: 300;
+  letter-spacing: 2px;
+  margin-top: 5px;
+  text-transform: uppercase;
+}
+/* Responsive logo-name-tagline sizing */
+@media (max-width: 1023px) {
+  .brand-logo {
+    width: 120px;
+    height: 120px;
+  }
+  .brand-name {
+    font-size: 2.5rem;
+  }
+  .brand-tagline {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .brand-logo {
+    width: 100px;
+    height: 100px;
+  }
+  .brand-name {
+    font-size: 2rem;
+  }
+  .brand-tagline {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 479px) {
+  .brand-logo {
+    width: 80px;
+    height: 80px;
+  }
+  .brand-name {
+    font-size: 1.8rem;
+  }
+  .brand-tagline {
+    font-size: 0.75rem;
+  }
+}
+
+.login-container {
+    max-width: 450px;
+    margin: 0 auto;
+    background: rgba(20, 20, 20, 0.85);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(255, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transform-origin: center center;
+    transform: translateY(0) scale(0.95);
+    opacity: 0;
+    height: 0;
+    padding: 0;
+    position: relative;
+    top: 0;
+    transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                opacity 0.45s ease,
+                height 0.45s ease,
+                padding 0.35s ease;
+}
+
+/* ensure hidden content doesn't peek */
+.login-container:not(.expanded) {
+    overflow: hidden;
+}
+
+
+.login-container.expanded {
+    opacity: 1;
+    height: auto;
+    padding: 40px;
+    top: 50%;
+    transform: translateY(-50%) scale(1.05);
+}
+
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #ff0000, #b30000);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .login-subtitle {
+            color: #888;
+            font-size: 1rem;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ff0000;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px 15px 15px 50px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(10, 10, 10, 0.7);
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            border-color: #ff0000;
+            box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.2);
+        }
+
+        .input-group input:focus + i {
+            color: #ff4d4d;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(to right, #ff0000, #b30000);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 0, 0, 0.6);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .credentials-hint {
+            text-align: center;
+            margin-top: 20px;
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 0, 0, 0.15) 0%, transparent 70%);
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+            100% { transform: translateY(0px) rotate(360deg); }
+        }
+
+        .travel-icons {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: -5px;
+            opacity: 0.7;
+        }
+
+        .travel-icon {
+            font-size: 1.8rem;
+            color: #ff4d4d;
+            transition: all 0.3s ease;
+        }
+
+        .travel-icon:hover {
+            color: #fff;
+            transform: translateY(-5px);
+        }
+
+        @media (max-width: 768px) {
+            .brand-name { font-size: 2.5rem; }
+            .login-container.expanded { padding: 30px 20px; }
+            .brand-logo { width: 80px; height: 80px; }
+        }
+        /* ============================= */
+/* 📱 RESPONSIVE DESIGN SETTINGS */
+/* ============================= */
+
+/* Large screens (1440px+) — keep center alignment and subtle scaling */
+@media (min-width: 1440px) {
+    .container {
+        max-width: 1400px;
+    }
+    .brand-name {
+        font-size: 5rem;
+    }
+    .brand-logo {
+        width: 200px;
+        height: 200px;
+    }
+}
+
+/* Laptops and medium desktops (1024px–1439px) */
+@media (max-width: 1439px) and (min-width: 1024px) {
+    .brand-logo {
+        width: 160px;
+        height: 160px;
+    }
+    .brand-name {
+        font-size: 4rem;
+        top: -45px;
+    }
+    .brand-tagline {
+        margin-top: -20px;
+        font-size: 1.1rem;
+    }
+    .login-container.expanded {
+        max-width: 420px;
+        padding: 35px;
+    }
+}
+
+/* Tablets (768px–1023px) */
+@media (max-width: 1023px) and (min-width: 768px) {
+    .brand-logo {
+        width: 120px;
+        height: 120px;
+    }
+    .brand-name {
+        font-size: 3rem;
+        top: -35px;
+    }
+    .brand-tagline {
+        font-size: 1rem;
+        margin-top: -10px;
+    }
+    .login-container.expanded {
+        max-width: 380px;
+        padding: 30px 25px;
+    }
+    .travel-icons {
+        gap: 20px;
+        margin-top: -10px;
+    }
+}
+
+/* Mobile devices (480px–767px) */
+@media (max-width: 767px) {
+    body {
+        padding: 20px;
+        background: linear-gradient(135deg, #000000, #220000);
+    }
+    .brand-logo {
+        width: 120px;
+        height: 120px;
+    }
+    .brand-name {
+        font-size: 2.5rem;
+        top: -25px;
+    }
+    .brand-tagline {
+        font-size: 0.9rem;
+        margin-top: -15px;
+        letter-spacing: 2px;
+    }
+    .login-container.expanded {
+        width: 100%;
+        padding: 25px 20px;
+        box-shadow: 0 10px 20px rgba(255, 0, 0, 0.25);
+    }
+    .login-title {
+        font-size: 1.8rem;
+    }
+    .travel-icons {
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 10px;
+    }
+    .travel-icon {
+        font-size: 1.4rem;
+    }
+}
+
+/* Small mobile (below 480px) */
+@media (max-width: 479px) {
+        body {
+        padding: 20px;
+        background: linear-gradient(135deg, #000000, #220000);
+    }
+    .brand-logo {
+        width: 120px;
+        height: 120px;
+    }
+    .brand-name {
+        font-size: 2.5rem;
+        top: -25px;
+    }
+    .brand-tagline {
+        font-size: 0.8rem;
+        margin-top: -10px;
+    }
+    .login-container.expanded {
+        padding: 20px 15px;
+    }
+    .input-group input {
+        padding: 12px 12px 12px 40px;
+        font-size: 0.9rem;
+    }
+    .login-btn {
+        padding: 12px;
+        font-size: 1rem;
+    }
+}
+        /* Shake animation for incorrect login */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+            20%, 40%, 60%, 80% { transform: translateX(10px); }
+        }
+/* Hide brand elements & icons when login expands */
+.brand-section.hidden,
+.travel-icons.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.95);
+    transition: all 0.6s ease;
+}
+
+.brand-section,
+.travel-icons {
+    transition: all 0.6s ease;
+}
+.travel-icons.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(1);
+  transition: all 2s ease;
+}
+
+.travel-icons {
+  transition: all 0.6s ease;
+}
+/* inner wrapper for shake isolation */
+.login-inner {
+  transition: transform 0.3s ease;
+}
+
+/* apply shake only to inner content */
+.login-inner.shaking {
+  animation: shake 0.5s ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+.particle-glow {
+    position: absolute;
+    background: rgba(255, 80, 80, 0.8);
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(255, 0, 0, 0.8);
+    animation: particleMove 12s ease-in-out infinite;
+}
+
+@keyframes particleMove {
+    0% { transform: translate(0, 0); opacity: 0.8; }
+    50% { transform: translate(20px, -30px); opacity: 0.3; }
+    100% { transform: translate(0, 0); opacity: 0.8; }
+}
+/* Add this to your CSS */
+.fade-out {
+    opacity: 0;
+    transition: opacity 0.8s ease;
+}
+/* Theme Toggle Styles */
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.theme-toggle i {
+    font-size: 1.2rem;
+    color: #fff;
+}
+
+/* Light Theme Variables */
+[data-theme="light"] {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --text-primary: #333333;
+    --text-secondary: #666666;
+    --accent-color: #dc2626;
+    --border-color: #e5e7eb;
+}
+
+/* 🌞 LIGHT THEME */
+[data-theme="light"] {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --text-primary: #111111;
+    --text-secondary: #555555;
+    --accent-color: #dc2626;
+    --border-color: #e5e7eb;
+    --shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+[data-theme="light"] body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+/* Brand Area */
+[data-theme="light"] .brand-name {
+    color: #000;
+    background: none;
+    -webkit-background-clip: text;
+background-clip: text;
+}
+
+[data-theme="light"] .brand-tagline {
+    color: var(--text-secondary);
+}
+
+[data-theme="light"] .brand-logo {
+    filter: drop-shadow(0 0 15px rgba(220, 38, 38, 0.3));
+}
+
+/* Login Box */
+[data-theme="light"] .login-container {
+    background: #fff;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+    color: var(--text-primary);
+}
+
+/* Input Fields */
+[data-theme="light"] .input-group input {
+    background: #f9f9f9;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+[data-theme="light"] .input-group input:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+/* Buttons */
+[data-theme="light"] .login-btn {
+    background: linear-gradient(to right, #dc2626, #b91c1c);
+    color: #fff;
+    box-shadow: 0 5px 15px rgba(220, 38, 38, 0.3);
+}
+
+/* Travel Icons */
+[data-theme="light"] .travel-icon {
+    color: #000;
+}
+[data-theme="light"] .travel-icon:hover {
+    color: #dc2626;
+}
+
+/* Hide dark-only visuals */
+[data-theme="light"] #starfield,
+[data-theme="light"] .floating-elements {
+    display: none;
+}
+
+/* Theme toggle button (light mode style) */
+[data-theme="light"] .theme-toggle {
+    background: rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+[data-theme="light"] .theme-toggle i {
+    color: #333;
+}
+
+    </style>
+</head>
+<body>
+    <div class="theme-toggle" id="themeToggle">
+    <i class="fas fa-moon"></i>
+</div>
+  <canvas id="starfield" aria-hidden="true"></canvas>
+
+    <div class="floating-elements" id="floatingElements"></div>
+    
+    <div class="container">
+        <div class="brand-section" id="brandSection">
+            <div class="brand-logo"></div>
+            <h1 class="brand-name">TRIP AGAIN</h1>
+            <p class="brand-tagline">YOUR JOURNEY BEGINS HERE</p>
+        </div>
+        
+<div class="login-container" id="loginContainer">
+  <div class="login-inner">
+      <div class="login-header">
+          <h2 class="login-title">Welcome Back</h2>
+          <p class="login-subtitle">Sign in to your account</p>
+      </div>
+
+      <div class="input-group">
+          <i class="fas fa-user"></i>
+          <input type="text" id="username" placeholder="Username" autocomplete="off">
+      </div>
+
+      <div class="input-group">
+          <i class="fas fa-lock"></i>
+          <input type="password" id="password" placeholder="Password" autocomplete="off">
+      </div>
+
+      <button class="login-btn" id="loginBtn">
+          <i class="fas fa-sign-in-alt"></i> Login to Dashboard
+      </button>
+
+      <div class="credentials-hint">
+          Use: admin / admin
+      </div>
+  </div>
+</div>
+
+<!-- ✅ Move travel icons BELOW the login container -->
+<div class="travel-icons">
+  <i class="fas fa-plane travel-icon"></i>
+  <i class="fas fa-hotel travel-icon"></i>
+  <i class="fas fa-passport travel-icon"></i>
+  <i class="fas fa-suitcase-rolling travel-icon"></i>
+  <i class="fas fa-map-marked-alt travel-icon"></i>
+</div>
+
+    <script>
+        // DOM elements
+        const brandSection = document.getElementById('brandSection');
+        const loginContainer = document.getElementById('loginContainer');
+        const loginBtn = document.getElementById('loginBtn');
+        const username = document.getElementById('username');
+        const password = document.getElementById('password');
+        const floatingElements = document.getElementById('floatingElements');
+
+        function createFloatingElements() {
+    const count = window.innerWidth < 768 ? 6 : 15;
+    for (let i = 0; i < count; i++) {
+        const element = document.createElement('div');
+        element.className = 'floating-element';
+        const size = Math.random() * 100 + 30;
+        element.style.width = size + 'px';
+        element.style.height = size + 'px';
+        element.style.left = Math.random() * 100 + '%';
+        element.style.top = Math.random() * 100 + '%';
+        element.style.animationDelay = Math.random() * 15 + 's';
+        element.style.animationDuration = (Math.random() * 10 + 10) + 's';
+        floatingElements.appendChild(element);
+    }
+}
+// Create subtle particle glow effect
+function createParticleGlow() {
+    for (let i = 0; i < 25; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle-glow';
+        particle.style.width = particle.style.height = Math.random() * 4 + 2 + 'px';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 10 + 's';
+        particle.style.animationDuration = (Math.random() * 5 + 8) + 's';
+        floatingElements.appendChild(particle);
+    }
+}
+createParticleGlow();
+
+
+
+brandSection.addEventListener('click', (e) => {
+    e.stopPropagation(); // prevent the document click handler from firing immediately
+    loginContainer.classList.toggle('expanded');
+
+    const travelIcons = document.querySelector('.travel-icons');
+
+    if (loginContainer.classList.contains('expanded')) {
+        // hide brand & icons
+        brandSection.classList.add('hidden');
+        travelIcons.classList.add('hidden');
+        brandSection.setAttribute('aria-expanded', 'true');
+        setTimeout(() => username.focus(), 600);
+    } else {
+        brandSection.classList.remove('hidden');
+        travelIcons.classList.remove('hidden');
+        brandSection.setAttribute('aria-expanded', 'false');
+    }
+});
+
+// Close login when clicking outside
+document.addEventListener('click', (e) => {
+    const travelIcons = document.querySelector('.travel-icons');
+
+    if (loginContainer.classList.contains('expanded') &&
+        !loginContainer.contains(e.target) &&
+        !brandSection.contains(e.target)) {
+
+        loginContainer.classList.remove('expanded');
+        brandSection.classList.remove('hidden');
+        travelIcons.classList.remove('hidden');
+        brandSection.setAttribute('aria-expanded', 'false');
+    }
+});
+
+loginBtn.addEventListener('click', () => {
+  const user = username.value.trim();
+  const pass = password.value.trim();
+
+  if (user === 'admin' && pass === 'admin') {
+    loginBtn.innerHTML = '<i class="fas fa-check"></i> Welcome! Redirecting...';
+    loginBtn.style.background = 'linear-gradient(to right, #4d0000, #ff0000)';
+
+    // Optional: fade-out effect for smooth transition
+    document.body.classList.add('fade-out');
+
+    // Save login session (optional, for dashboard access control)
+    localStorage.setItem('isLoggedIn', 'true');
+
+    // Redirect to dashboard after short delay
+    setTimeout(() => {
+      window.location.href = 'dashboard.html';
+    }, 1500);
+
+  } else {
+    const loginInner = document.querySelector('.login-inner');
+    loginInner.classList.add('shaking');
+    setTimeout(() => loginInner.classList.remove('shaking'), 500);
+
+    password.value = '';
+    username.focus();
+  }
+});
+
+
+        password.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') loginBtn.click();
+        });
+
+        createFloatingElements();
+        // Starfield with subtle breathing/twinkle
+function initStarfield() {
+    const canvas = document.getElementById('starfield');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let w = canvas.width = window.innerWidth;
+    let h = canvas.height = window.innerHeight;
+
+    const count = window.innerWidth < 768 ? 80 : window.innerWidth < 1200 ? 150 : 250;
+    const stars = [];
+    for (let i = 0; i < count; i++) {
+        stars.push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            r: Math.random() * 1.6 + 0.3,
+            base: Math.random() * 0.8 + 0.2,
+            phase: Math.random() * Math.PI * 2
+        });
+    }
+
+    window.addEventListener('resize', () => {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+    });
+
+    let t = 0;
+    function render() {
+        ctx.clearRect(0, 0, w, h);
+
+        // slight dark red vignette overlay for mood (very subtle)
+        const g = ctx.createLinearGradient(0, 0, 0, h);
+        g.addColorStop(0, 'rgba(0,0,0,0.02)');
+        g.addColorStop(1, 'rgba(51,0,0,0.06)');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, w, h);
+
+        // draw stars with breathing
+        for (const s of stars) {
+            const a = s.base * (0.6 + 0.4 * Math.sin(t * 0.002 + s.phase));
+            ctx.beginPath();
+            ctx.fillStyle = `rgba(255,255,255,${a})`;
+            ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        t++;
+        requestAnimationFrame(render);
+    }
+    render();
+}
+initStarfield();
+// Close on Escape
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && loginContainer.classList.contains('expanded')) {
+        const travelIcons = document.querySelector('.travel-icons');
+        loginContainer.classList.remove('expanded');
+        brandSection.classList.remove('hidden');
+        travelIcons.classList.remove('hidden');
+        brandSection.setAttribute('aria-expanded', 'false');
+    }
+});
+
+// Make brandSection accessible by keyboard
+brandSection.setAttribute('role', 'button');
+brandSection.setAttribute('tabindex', '0');
+brandSection.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') brandSection.click();
+});
+const themeToggle = document.getElementById('themeToggle');
+
+// Toggle between dark and light themes
+function toggleTheme() {
+    const html = document.documentElement; // this means <html>
+    const currentTheme = html.getAttribute('data-theme');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+    html.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+
+    // Change the icon (moon or sun)
+    const icon = themeToggle.querySelector('i');
+    icon.className = newTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+}
+
+// Set theme when the page loads
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+
+    document.documentElement.setAttribute('data-theme', theme);
+
+    // Update icon
+    const icon = themeToggle.querySelector('i');
+    icon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+}
+
+themeToggle.addEventListener('click', toggleTheme);
+initTheme();
+    </script>
+</body>
+</html>

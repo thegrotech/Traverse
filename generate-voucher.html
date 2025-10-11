@@ -1,0 +1,1040 @@
+  <!doctype html>
+  <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Trip Again Pvt Ltd — Voucher Generator</title>
+
+    <!-- html2pdf for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+      :root{
+        --brand-red: #d62828;
+        --brand-black: #111;
+        --brand-white: #fff;
+        --muted: #666;
+        --card-bg: #fff;
+        --page-bg: #efefef;
+      }
+      /* Basic layout */
+      *{box-sizing:border-box}
+      body{
+        margin: 16px;
+        font-family: "Segoe UI", Roboto, Arial, sans-serif;
+        background: var(--page-bg);
+        color: #222;
+        -webkit-font-smoothing:antialiased;
+      }
+      .app { max-width:1200px; margin: 16px auto; }
+      .card {
+        background: var(--card-bg);
+        border-radius: 14px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.07);
+        overflow: hidden;
+      }
+      .toolbar {
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:12px;
+        padding:12px 16px;
+        background: var(--brand-black);
+        color: var(--brand-white);
+      }
+      .toolbar .left, .toolbar .right { display:flex; gap:8px; align-items:center; }
+      .btn {
+        border: none;
+        cursor:pointer;
+        padding:8px 12px;
+        border-radius:8px;
+        font-weight:600;
+        background:#fff;
+        color:var(--brand-black);
+      }
+      .btn.primary { background:var(--brand-red); color:#fff; border: 1px solid rgba(0,0,0,0.06); }
+      .btn.ghost { background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.08); }
+      .btn.warn { background:#f6a623; color:#fff; }
+      .btn.small { padding:6px 8px; font-size:13px; border-radius:6px; }
+
+      .workspace {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 18px;
+  }
+
+      /* Left: form, Right: preview */
+      .panel {
+        background: var(--card-bg);
+        border-radius: 10px;
+        padding: 14px;
+        border:1px solid #eee;
+      }
+      .panel h3 { margin:0 0 8px 0; color:var(--brand-red); font-size:16px; }
+      .field { display:flex; gap:8px; align-items:center; margin-bottom:8px; }
+      .field label { width:160px; font-size:13px; color:var(--muted); }
+      .field input[type="text"], .field input[type="date"], .field input[type="time"], .field input[type="number"], .field select {
+        flex:1; padding:8px 10px; border-radius:6px; border:1px solid #ddd; font-size:14px;
+      }
+      .inline { display:flex; gap:8px; align-items:center; }
+      .muted { color:var(--muted); font-size:13px; }
+      .small { font-size:13px; color:var(--muted); }
+
+      /* traveller list table */
+      .travellers-list { border-top:1px dashed #eee; margin-top:8px; padding-top:8px; }
+      .travellers-list .row { display:flex; gap:8px; align-items:center; margin-bottom:6px; }
+      .travellers-list .row span { flex:1; font-size:14px; }
+
+      /* preview / voucher */
+      .preview {
+        padding:12px;
+      }
+      .voucher {
+        width:100%;
+        background:#fff;
+        border-radius:8px;
+        padding:18px;
+        border:1px solid #eee;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+        font-size:14px;
+        color:#222;
+      }
+      .voucher .v-header { display:flex; justify-content:space-between; align-items:center; gap:8px; background:var(--brand-black); color:#fff; padding:12px; border-radius:8px; }
+      .brand { display:flex; gap:12px; align-items:center; }
+      .brand img { width:56px; height:56px; object-fit:contain; border-radius:8px; background:#fff; padding:6px; }
+      .v-meta { text-align:right; font-size:13px; color:#fff; }
+      .v-section { border-bottom:1px dashed #eee; padding:10px 0; margin-top:10px; }
+      .v-section h4 { margin:0 0 6px 0; color:var(--brand-red); font-size:14px; }
+      .v-grid { display:grid; grid-template-columns: 1fr 1fr; gap:8px; }
+      .v-table { width:100%; border-collapse:collapse; margin-top:8px; font-size:14px; }
+      .v-table th, .v-table td { text-align:left; padding:6px 8px; border: 1px solid #f0f0f0; }
+      .v-right { text-align:right; }
+      .v-terms { font-size:12px; color:#444; margin-top:8px; background:#f9f9f9; padding:8px; border-radius:6px; border:1px solid #f0f0f0; }
+
+      /* small screens */
+      @media (max-width:1000px){
+        .workspace { flex-direction: column; }
+        .preview { order: -1; }
+      }
+      @media (max-width:600px){
+    .field { 
+      flex-direction: column; 
+      align-items: flex-start; 
+    }
+    .field label { 
+      width:100%; 
+      margin-bottom:4px; 
+    }
+  }
+
+
+/* PRINT STYLES for A4 */
+@media print {
+  body * {
+    visibility: hidden; /* hide everything */
+  }
+  #voucherPreview, #voucherPreview * {
+    visibility: visible; /* only show the voucher */
+  }
+  #voucherPreview {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;   /* A4 width */
+    max-width: 210mm;
+    min-height: 270mm; /* A4 height */
+    margin: 0 auto;
+    padding: 16px;
+    border: none;
+    box-shadow: none;
+  }
+  
+  /* Hide only the Action column in the Hotels table */
+  #voucherPreview .v-section:nth-child(4) .v-table th:last-child,
+  #voucherPreview .v-section:nth-child(4) .v-table td:last-child {
+    display: none;
+  }
+}
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div class="card">
+        <div class="toolbar">
+          <div class="left">
+            <strong style="font-size:16px">Trip Again Pvt Ltd</strong>
+            <div class="small" style="color:#fff; margin-left:8px">DTS & IATA Registered — Voucher Engine</div>
+          </div>
+          <div class="right">
+            <button class="btn ghost" id="btnNew">New</button>
+            <button class="btn" id="btnLoadSample">Load Sample</button>
+            <button class="btn" id="btnSaveLocal">Save Local</button>
+            <button class="btn primary" id="btnPdf">Download PDF</button>
+            <button class="btn" id="btnPrint">Print</button>
+          </div>
+        </div>
+
+        <div class="workspace">
+          <!-- LEFT: Form -->
+          <div style="padding:12px;">
+            <div class="panel">
+              <h3>Voucher Details</h3>
+              <div class="field">
+                <label>Voucher No.</label>
+                <div style="flex:1;">
+                  <div id="voucherNo" style="font-weight:700; font-size:15px;">VCH-2025-0001</div>
+                </div>
+                <label style="width:100px">Issue Date</label>
+                <div><input id="issueDate" type="date" /></div>
+              </div>
+
+              <!-- Travellers -->
+              <h3 style="margin-top:12px">Traveller(s)</h3>
+              <div class="field">
+                <label>Full Name</label>
+                <input id="t_name" type="text" placeholder="Full name" />
+              </div>
+              <div class="field">
+                <label>Passport No.</label>
+                <input id="t_passport" type="text" placeholder="Passport number" />
+              </div>
+              <div class="field">
+                <label>Visa No. (optional)</label>
+                <input id="t_visa" type="text" placeholder="Visa number (optional)" />
+              </div>
+              <div class="field">
+                <label>Visa Issue (optional)</label>
+                <input id="t_visa_issue" type="date" />
+              </div>
+              <div style="display:flex; gap:8px; margin-bottom:8px;">
+                <button class="btn small" id="btnAddTraveller">Add Traveller</button>
+                <button class="btn small" id="btnClearTraveller">Clear Fields</button>
+              </div>
+
+              <div class="travellers-list panel" id="travellersList" style="border-radius:8px;">
+                <div class="small muted">No travellers added yet.</div>
+              </div>
+            </div>
+
+            <!-- Flights -->
+            <div class="panel" style="margin-top:12px;">
+              <h3>Flight Details</h3>
+
+              <!-- Outbound -->
+              <div style="margin-bottom:8px;">
+                <h4 style="margin:0 0 6px 0">Outbound (Departure → Arrival)</h4>
+                <div class="field">
+                  <label>Departure City</label><input id="out_dep_city" type="text" placeholder="City" />
+                </div>
+                <div class="field">
+                  <label>Departure Date</label><input id="out_dep_date" type="date" />
+                  <label style="width:120px">Departure Time</label><input id="out_dep_time" type="time" />
+                </div>
+                <div class="field">
+                  <label>Arrival City</label><input id="out_arr_city" type="text" placeholder="City" />
+                  <label style="width:120px">Arrival Date</label><input id="out_arr_date" type="date" />
+                  <label style="width:120px">Arrival Time</label><input id="out_arr_time" type="time" />
+                </div>
+                <div class="field">
+                  <label>Flight No.</label><input id="out_flight_no" type="text" placeholder="e.g. SV-621" />
+                  <label style="width:120px">PNR / Ref</label><input id="out_pnr" type="text" placeholder="Optional" />
+                </div>
+              </div>
+
+              <!-- Return -->
+              <div style="margin-top:6px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <input id="hasReturn" type="checkbox" /><label for="hasReturn" class="small">Include Return Flight</label>
+                </div>
+                <div id="returnBlock" style="margin-top:8px; display:none;">
+                  <h4 style="margin:0 0 6px 0">Return (Back home)</h4>
+                  <div class="field">
+                    <label>Departure City</label><input id="ret_dep_city" type="text" placeholder="City" />
+                  </div>
+                  <div class="field">
+                    <label>Departure Date</label><input id="ret_dep_date" type="date" />
+                    <label style="width:120px">Departure Time</label><input id="ret_dep_time" type="time" />
+                  </div>
+                  <div class="field">
+                    <label>Arrival City</label><input id="ret_arr_city" type="text" placeholder="City" />
+                    <label style="width:120px">Arrival Date</label><input id="ret_arr_date" type="date" />
+                    <label style="width:120px">Arrival Time</label><input id="ret_arr_time" type="time" />
+                  </div>
+                  <div class="field">
+                    <label>Flight No.</label><input id="ret_flight_no" type="text" placeholder="e.g. SV-622" />
+                    <label style="width:120px">PNR / Ref</label><input id="ret_pnr" type="text" placeholder="Optional" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hotel -->
+            <div class="panel" style="margin-top:12px;">
+              <h3>Hotel / Stay Details</h3>
+              <div class="field">
+                <label>Hotel Name</label><input id="hotel_name" type="text" placeholder="Hotel name" />
+              </div>
+              
+              <div class="field">
+                <label>City</label><input id="hotel_city" type="text" placeholder="City" />
+                <label style="width:120px">Room Type</label>
+                <select id="room_type">
+                  <option>Single</option>
+                  <option>Double</option>
+                  <option>Triple</option>
+                  <option>Quad</option>
+                  <option>Quint</option>
+                  <option>Hexa</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Check-in</label><input id="checkin" type="date" />
+                <label style="width:120px">Check-out</label><input id="checkout" type="date" />
+              </div>
+              <div class="field">
+                <label>Number of Nights</label><input id="nights" type="number" readonly />
+                <label style="width:120px">No. of Rooms</label><input id="rooms" type="number" min="1" value="1" />
+              </div>
+              <div class="field">
+                <label>Rate (optional)</label><input id="room_rate" type="number" min="0" />
+                <label style="width:120px">Total (optional)</label><input id="room_total" type="number" readonly />
+              </div>
+              <div class="field">
+                <label>Notes</label><input id="hotel_notes" type="text" placeholder="e.g. breakfast included" />
+              </div>
+              <div class="panel" style="margin-top:12px;">  
+                <div id="hotelContainer"></div>
+                <button class="btn small" id="btnAddHotel" type="button">+ Add Hotel</button>
+              </div>
+            </div>
+
+            <!-- Transport -->
+            <div class="panel" style="margin-top:12px;">
+              <h3>Transport Details</h3>
+
+              <div class="field">
+                <label>Transport Route</label>
+                <select id="transport_route" onchange="toggleCustomRoute()">
+                  <option value="Option 1">Jeddah Airport → Makkah Hotel → Madinah Hotel → Makkah Hotel → Jeddah Airport</option>
+                  <option value="Option 2">Jeddah Airport → Makkah Hotel → Madinah Hotel → Madinah Airport</option>
+                  <option value="Option 3">Madinah Airport → Madinah Hotel → Makkah Hotel → Jeddah Airport</option>
+                  <option value="Custom">Custom</option>
+                </select>
+              </div>
+
+              <div class="field" id="customRouteField" style="display:none;">
+                <label>Custom Route</label>
+                <input id="custom_transport" type="text" placeholder="Enter custom transport plan" />
+              </div>
+
+              <div class="field">
+                <label>Vehicle Type</label>
+                <select id="transport_vehicle">
+                  <option>Car</option>
+                  <option>H1 Van</option>
+                  <option>HiAce</option>
+                  <option>Coaster</option>
+                  <option>Bus</option>
+                  <option>GMC / SUV</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Notes & actions -->
+            <div class="panel" style="margin-top:12px;">
+              <h3>Notes & Actions</h3>
+              <div class="field">
+                <label>Remarks</label>
+                <input id="remarks" type="text" placeholder="Optional remarks for voucher" />
+              </div>
+              <div style="display:flex; gap:8px; margin-top:6px;">
+                <button class="btn primary" id="btnGenerate">Generate Preview</button>
+                <button class="btn" id="btnClearAll">Clear All</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT: Preview -->
+          <div class="preview panel">
+            <div class="voucher" id="voucherPreview">
+              <div class="v-header">
+                <div class="brand" style="align-items:center;">
+                  <img src="Trip Again Logo Icon.svg" alt="Trip Again Logo" />
+                  <div>
+                    <div style="font-weight:800; font-size:18px;">Trip Again Pvt Ltd</div>
+                    <div class="small" style="color:#fff; opacity:0.95">Travel Services & Solutions — DTS & IATA Registered</div>
+                  </div>
+                </div>
+                <div class="v-meta">
+                  <div id="pv_voucherNo" style="font-weight:700;">VCH-2025-0001</div>
+                  <div id="pv_issueDate" style="font-size:13px;">Issued: 01 Jan 2025</div>
+                </div>
+              </div>
+
+              <div class="v-section">
+                <h4>Traveller(s)</h4>
+                <table class="v-table" id="pv_travellers">
+                  <thead><tr><th>Name</th><th>Passport</th><th>Visa (if any)</th><th>Visa Issue</th></tr></thead>
+                  <tbody><tr><td colspan="4" class="small muted">No travellers added</td></tr></tbody>
+                </table>
+              </div>
+
+              <div class="v-section">
+                <h4>Flight Details</h4>
+                <div style="margin-top:6px;">
+                  <div style="font-weight:700; margin-bottom:6px;">Outbound</div>
+                  <div class="v-grid">
+                    <div>
+                      <div><strong>Departure:</strong> <span id="pv_out_dep_city">-</span></div>
+                      <div><strong>Date:</strong> <span id="pv_out_dep_date">-</span> <strong>Time:</strong> <span id="pv_out_dep_time">-</span></div>
+                    </div>
+                    <div>
+                      <div><strong>Arrival:</strong> <span id="pv_out_arr_city">-</span></div>
+                      <div><strong>Date:</strong> <span id="pv_out_arr_date">-</span> <strong>Time:</strong> <span id="pv_out_arr_time">-</span></div>
+                    </div>
+                  </div>
+                  <div style="margin-top:6px;"><strong>Flight No:</strong> <span id="pv_out_flight_no">-</span> &nbsp; <strong>PNR:</strong> <span id="pv_out_pnr">-</span></div>
+                </div>
+
+                <div id="pv_return_area" style="margin-top:12px; display:none;">
+                  <div style="font-weight:700; margin-bottom:6px;">Return</div>
+                  <div class="v-grid">
+                    <div>
+                      <div><strong>Departure:</strong> <span id="pv_ret_dep_city">-</span></div>
+                      <div><strong>Date:</strong> <span id="pv_ret_dep_date">-</span> <strong>Time:</strong> <span id="pv_ret_dep_time">-</span></div>
+                    </div>
+                    <div>
+                      <div><strong>Arrival:</strong> <span id="pv_ret_arr_city">-</span></div>
+                      <div><strong>Date:</strong> <span id="pv_ret_arr_date">-</span> <strong>Time:</strong> <span id="pv_ret_arr_time">-</span></div>
+                    </div>
+                  </div>
+                  <div style="margin-top:6px;"><strong>Flight No:</strong> <span id="pv_ret_flight_no">-</span> &nbsp; <strong>PNR:</strong> <span id="pv_ret_pnr">-</span></div>
+                </div>
+              </div>
+
+              <div class="v-section">
+                <h4>Hotels / Stay</h4>
+                <table class="v-table">
+                  <thead>
+                    <tr>
+                      <th>Hotel</th>
+                      <th>City</th>
+                      <th>Check-in</th>
+                      <th>Check-out</th>
+                      <th>Nights</th>
+                      <th>Rooms</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="pv_hotels">
+                    <tr><td colspan="7">No hotels added</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="v-section">
+                <h4>Transport Details</h4>
+                <div><strong>Route:</strong> <span id="pv_transport_route">-</span></div>
+                <div><strong>Vehicle:</strong> <span id="pv_transport_vehicle">-</span></div>
+              </div>
+
+              <div class="v-section">
+                <h4>Remarks</h4>
+                <div id="pv_remarks" class="small muted">-</div>
+              </div>
+
+              <div class="v-section">
+                <h4>Terms & Conditions</h4>
+                <div class="v-terms" id="pv_terms">
+                  <ol style="margin:0 0 0 18px; padding:0;">
+                    <li>Voucher must be presented at the time of check-in.</li>
+                    <li>Rooms & services are subject to availability and hotel policies.</li>
+                    <li>Voucher is non-transferable and has no cash value.</li>
+                    <li>Cancellations or modifications are subject to supplier policy and fees.</li>
+                    <li>Trip Again Pvt Ltd acts as an agent; not liable for third-party delays or cancellations.</li>
+                    <li>Traveller must carry valid passport & visa at all times.</li>
+                    <li>Any incidental charges are payable by the guest at hotel check-in/out.</li>
+                    <li>For full terms, contact Trip Again Pvt Ltd — info@tripagainp.pk.</li>
+                  </ol>
+                </div>
+              </div>
+
+              <div style="margin-top:20px; display:flex; justify-content:space-between; align-items:flex-start;">
+    <!-- Left side -->
+    <div>
+      <div style="font-size:12px; color:#666;">This voucher is computer generated and valid without signature.</div>
+      <div style="font-size:12px; color:#666; margin-top:4px;">
+        Digital Voucher Engine Developed by <strong>GroTech Solutions</strong>.
+      </div>
+    </div>
+
+    <!-- Right side -->
+    <div style="text-align:right;">
+      <div style="font-weight:800; color:var(--brand-red);">Trip Again Pvt Ltd</div>
+      <div style="font-size:12px; color:#666;">
+        Office #2, Ground Floor, Plot 263-C, PECHS Block 2, Karachi, Pakistan<br>
+        📧 info@tripagainp.pk | ☎ +92 333 3473348
+      </div>
+    </div>
+  </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /******************************************************************
+       * Voucher Generator JavaScript
+       * - Handles form interactions, preview rendering, PDF generation,
+       *   local save/load and JSON export/import.
+       ******************************************************************/
+      // App state
+      let travellers = []; // array of {name, passport, visa, visa_issue}
+      let hotels = [];     // multiple hotels
+      let voucherCounter = parseInt(localStorage.getItem('voucherCounter')||'1', 10);
+
+      // DOM helper (declare early so functions can use it safely)
+      const el = id => document.getElementById(id);
+
+      // ----------------- Hotel functions -----------------
+      function clearHotelForm() {
+        el('hotel_name').value = '';
+        el('hotel_city').value = '';
+        el('checkin').value = '';
+        el('checkout').value = '';
+        el('nights').value = '';
+        el('rooms').value = 1;
+        el('room_type').value = 'Double';
+        el('room_rate').value = '';
+        el('room_total').value = '';
+        el('hotel_notes').value = '';
+      }
+
+      function addHotel() {
+        // basic validation
+        const name = (el('hotel_name').value || '').trim();
+        const city = (el('hotel_city').value || '').trim();
+        if (!name || !city) {
+          alert('Please enter at least Hotel Name and City before adding.');
+          return;
+        }
+        const hotel = {
+          name,
+          city,
+          checkin: el('checkin').value || '',
+          checkout: el('checkout').value || '',
+          nights: el('nights').value || '0',
+          rooms: el('rooms').value || '1',
+          room_type: el('room_type').value || '',
+          rate: el('room_rate').value || '',
+          total: el('room_total').value || '',
+          notes: el('hotel_notes').value || ''
+        };
+        hotels.push(hotel);
+        renderHotels();
+        clearHotelForm();
+        renderPreviewFromForm(); // refresh preview
+      }
+
+function renderHotels() {
+  const tbody = el("pv_hotels");
+  if (!tbody) return;
+  if (hotels.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7">No hotels added</td></tr>';
+    return;
+  }
+  tbody.innerHTML = hotels.map((h, i) => `
+    <tr>
+      <td>${escapeHtml(h.name)}</td>
+      <td>${escapeHtml(h.city)}</td>
+      <td>${escapeHtml(h.checkin)}</td>
+      <td>${escapeHtml(h.checkout)}</td>
+      <td>${escapeHtml(h.nights)}</td>
+      <td>${escapeHtml(h.rooms)} x ${escapeHtml(h.room_type)}</td>
+      <td><button class="btn small" onclick="removeHotel(${i})">Delete</button></td>
+    </tr>
+  `).join('');
+  
+  // Add hotel count display
+  const hotelContainer = el('hotelContainer');
+  if (hotelContainer) {
+    hotelContainer.innerHTML = `<div class="small muted">${hotels.length} hotel(s) added - fill form above to add more</div>`;
+  }
+}
+
+      function removeHotel(index) {
+        if (index >= 0 && index < hotels.length) {
+          if (confirm("Are you sure you want to delete this hotel?")) {
+            hotels.splice(index, 1);
+            renderHotels();
+            renderPreviewFromForm();
+          }
+        }
+      }
+
+      // ----------------- Transport -----------------
+      function toggleCustomRoute() {
+        const sel = el('transport_route').value;
+        el('customRouteField').style.display = (sel === 'Custom') ? 'flex' : 'none';
+      }
+
+      function renderTransport() {
+    const select = el('transport_route');
+    let route = select.options[select.selectedIndex].text; // <-- actual label
+
+    if (select.value === 'Custom') {
+      route = el('custom_transport').value || 'Custom route not specified';
+    }
+
+    el('pv_transport_route').textContent = route;
+    el('pv_transport_vehicle').textContent = el('transport_vehicle').value || '-';
+  }
+
+
+      // ----------------- other DOM refs -----------------
+      const voucherNoEl = el('voucherNo');
+      const issueDateEl = el('issueDate');
+
+      const pv_voucherNo = el('pv_voucherNo');
+      const pv_issueDate = el('pv_issueDate');
+
+      const travellersListEl = el('travellersList');
+      const pv_travellers_tbody = el('pv_travellers').querySelector('tbody');
+
+      // Init on load
+      function init() {
+        // Set issue date to today by default
+        const today = new Date().toISOString().slice(0,10);
+        issueDateEl.value = today;
+
+        // Initialize voucher number (format VCH-YYYY-0001)
+        setNewVoucherNo();
+
+        // Wire up buttons
+        el('btnAddTraveller').addEventListener('click', addTravellerFromForm);
+        el('btnClearTraveller').addEventListener('click', clearTravellerForm);
+        // Update your Generate Preview button event listener:
+el('btnGenerate').addEventListener('click', () => {
+  if (travellers.length === 0) {
+    alert('Please add at least one traveller before generating preview.');
+    return;
+  }
+  if (hotels.length === 0) {
+    alert('Please add at least one hotel before generating preview.');
+    return;
+  }
+  renderPreviewFromForm();
+  alert('Preview updated successfully!');
+});
+        el('btnClearAll').addEventListener('click', clearAll);
+        el('hasReturn').addEventListener('change', toggleReturnBlock);
+        el('checkin').addEventListener('change', computeNights);
+        el('checkout').addEventListener('change', computeNights);
+        el('room_rate').addEventListener('input', computeRoomTotal);
+        el('rooms').addEventListener('input', computeRoomTotal);
+        el('btnPdf').addEventListener('click', downloadPdf);
+        el('btnPrint').addEventListener('click', () => window.print());
+        el('btnNew').addEventListener('click', newVoucher);
+        el('btnLoadSample').addEventListener('click', loadSample);
+        el('btnSaveLocal').addEventListener('click', saveToLocal);
+        el('btnAddHotel').addEventListener('click', addHotel);
+
+        // initial render
+        renderTravellersList();
+        renderHotels();
+        renderPreviewFromForm();
+      }
+
+      // Create new voucher (increment counter)
+      function setNewVoucherNo(){
+        const year = new Date().getFullYear();
+        const num = String(voucherCounter).padStart(4,'0');
+        const vNo = `VCH-${year}-${num}`;
+        voucherNoEl.textContent = vNo;
+        pv_voucherNo.textContent = vNo;
+      }
+
+      // When user clicks New voucher: increment counter and reset fields
+      function newVoucher(){
+        voucherCounter = (voucherCounter || 1) + 1;
+        localStorage.setItem('voucherCounter', String(voucherCounter));
+        setNewVoucherNo();
+        // reset fields
+        issueDateEl.value = new Date().toISOString().slice(0,10);
+        travellers = [];
+        hotels = []; // clear hotels too
+        clearTravellerForm();
+        clearHotelForm();
+
+        el('out_dep_city').value = '';
+        el('out_dep_date').value = '';
+        el('out_dep_time').value = '';
+        el('out_arr_city').value = '';
+        el('out_arr_date').value = '';
+        el('out_arr_time').value = '';
+        el('out_flight_no').value = '';
+        el('out_pnr').value = '';
+
+        el('hasReturn').checked = false;
+        toggleReturnBlock();
+
+        el('ret_dep_city').value = '';
+        el('ret_dep_date').value = '';
+        el('ret_dep_time').value = '';
+        el('ret_arr_city').value = '';
+        el('ret_arr_date').value = '';
+        el('ret_arr_time').value = '';
+        el('ret_flight_no').value = '';
+        el('ret_pnr').value = '';
+
+        el('hotel_name').value = '';
+        el('hotel_city').value = '';
+        el('checkin').value = '';
+        el('checkout').value = '';
+        el('nights').value = '';
+        el('rooms').value = 1;
+        el('room_type').value = 'Double';
+        el('room_rate').value = '';
+        el('room_total').value = '';
+        el('hotel_notes').value = '';
+        el('remarks').value = '';
+
+        renderTravellersList();
+        renderHotels();
+        renderPreviewFromForm();
+      }
+
+      // Add traveller from form inputs
+      function addTravellerFromForm(){
+        const name = el('t_name').value.trim();
+        const passport = el('t_passport').value.trim();
+        const visa = el('t_visa').value.trim();
+        const visa_issue = el('t_visa_issue').value || '';
+
+        if(!name || !passport){
+          alert('Please enter traveller name and passport number before adding.');
+          return;
+        }
+        travellers.push({ name, passport, visa, visa_issue });
+        renderTravellersList();
+        clearTravellerForm();
+        renderPreviewFromForm();
+      }
+
+      function clearTravellerForm(){
+        el('t_name').value = '';
+        el('t_passport').value = '';
+        el('t_visa').value = '';
+        el('t_visa_issue').value = '';
+      }
+
+      // Render travellers list in form area
+      function renderTravellersList(){
+        if(travellers.length === 0){
+          travellersListEl.innerHTML = '<div class="small muted">No travellers added yet.</div>';
+          pv_travellers_tbody.innerHTML = '<tr><td colspan="4" class="small muted">No travellers added</td></tr>';
+          return;
+        }
+        // Form-side list with remove
+        let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><div style="font-weight:700">Travellers</div><div class="small muted">Total: '+travellers.length+'</div></div>';
+        travellers.forEach((t, i) => {
+          html += `<div class="row"><span><strong>${escapeHtml(t.name)}</strong> — ${escapeHtml(t.passport)}</span><button class="btn small" data-idx="${i}" onclick="removeTraveller(event)">Remove</button></div>`;
+        });
+        travellersListEl.innerHTML = html;
+
+        // Preview table
+        const rows = travellers.map(t => {
+          return `<tr><td>${escapeHtml(t.name)}</td><td>${escapeHtml(t.passport)}</td><td>${escapeHtml(t.visa||'-')}</td><td>${t.visa_issue?escapeHtml(t.visa_issue):'-'}</td></tr>`;
+        }).join('');
+        pv_travellers_tbody.innerHTML = rows;
+      }
+
+      // remove traveller
+      function removeTraveller(e){
+        const idx = parseInt(e.currentTarget.dataset.idx, 10);
+        if(!isNaN(idx)) {
+          travellers.splice(idx,1);
+          renderTravellersList();
+          renderPreviewFromForm();
+        }
+      }
+
+      // Toggle return block visibility
+      function toggleReturnBlock(){
+        const has = el('hasReturn').checked;
+        el('returnBlock').style.display = has ? 'block' : 'none';
+        el('pv_return_area').style.display = has ? 'block' : 'none';
+      }
+
+      // Compute nights between checkin & checkout
+  function computeNights(){
+    const ci = el('checkin').value;
+    const co = el('checkout').value;
+    if(ci && co){
+      const d1 = new Date(ci);
+      const d2 = new Date(co);
+          if (d2 < d1) {
+      alert('Check-out date cannot be before check-in date!');
+      el('checkout').value = '';
+      el('nights').value = '';
+      return;
+    }
+      // calculate difference in days (number of nights)
+      const diffTime = d2 - d1;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      el('nights').value = diffDays >= 0 ? diffDays : 0;
+      computeRoomTotal();
+    } else {
+      el('nights').value = '';
+    }
+  }
+
+      // compute room total if rate & nights & rooms available
+      function computeRoomTotal(){
+        const rate = parseFloat(el('room_rate').value) || 0;
+        const nights = parseInt(el('nights').value) || 0;
+        const rooms = parseInt(el('rooms').value) || 1;
+        const total = rate * nights * rooms;
+        el('room_total').value = total > 0 ? total.toFixed(2) : '';
+      }
+
+      // Render preview values from form
+      function renderPreviewFromForm(){
+        // meta
+        pv_voucherNo.textContent = voucherNoEl.textContent;
+        pv_issueDate.textContent = 'Issued: ' + (issueDateEl.value || new Date().toISOString().slice(0,10));
+
+        // travellers already rendered
+        renderTravellersList();
+
+        // outbound
+        el('pv_out_dep_city').textContent = el('out_dep_city').value || '-';
+        el('pv_out_dep_date').textContent = el('out_dep_date').value || '-';
+        el('pv_out_dep_time').textContent = el('out_dep_time').value || '-';
+        el('pv_out_arr_city').textContent = el('out_arr_city').value || '-';
+        el('pv_out_arr_date').textContent = el('out_arr_date').value || '-';
+        el('pv_out_arr_time').textContent = el('out_arr_time').value || '-';
+        el('pv_out_flight_no').textContent = el('out_flight_no').value || '-';
+        el('pv_out_pnr').textContent = el('out_pnr').value || '-';
+
+        // return
+        const hasReturn = el('hasReturn').checked;
+        el('pv_return_area').style.display = hasReturn ? 'block' : 'none';
+        el('pv_ret_dep_city').textContent = el('ret_dep_city').value || '-';
+        el('pv_ret_dep_date').textContent = el('ret_dep_date').value || '-';
+        el('pv_ret_dep_time').textContent = el('ret_dep_time').value || '-';
+        el('pv_ret_arr_city').textContent = el('ret_arr_city').value || '-';
+        el('pv_ret_arr_date').textContent = el('ret_arr_date').value || '-';
+        el('pv_ret_arr_time').textContent = el('ret_arr_time').value || '-';
+        el('pv_ret_flight_no').textContent = el('ret_flight_no').value || '-';
+        el('pv_ret_pnr').textContent = el('ret_pnr').value || '-';
+
+        // hotels - render from hotels[] array (this will update pv_hotels)
+        renderHotels();
+
+        // transport
+        renderTransport();
+
+        // remarks
+        el('pv_remarks').textContent = el('remarks').value || '-';
+      }
+
+      // clear all fields (prompt)
+      function clearAll(){
+        if(!confirm('Clear all fields and start a fresh voucher?')) return;
+        newVoucher();
+      }
+
+      // Save voucher to localStorage (lastVoucher)
+      function saveToLocal(){
+        const data = gatherVoucherData();
+        localStorage.setItem('lastVoucher', JSON.stringify(data));
+        alert('Voucher saved locally (Browser storage). Use Import/Export JSON to share.');
+      }
+
+      // Gather data object from current form state
+      function gatherVoucherData(){
+        const data = {
+          voucherNo: voucherNoEl.textContent,
+          issueDate: issueDateEl.value || new Date().toISOString().slice(0,10),
+          travellers: JSON.parse(JSON.stringify(travellers)),
+          hotels: JSON.parse(JSON.stringify(hotels)),
+          flights: {
+            outbound: {
+              dep_city: el('out_dep_city').value,
+              dep_date: el('out_dep_date').value,
+              dep_time: el('out_dep_time').value,
+              arr_city: el('out_arr_city').value,
+              arr_date: el('out_arr_date').value,
+              arr_time: el('out_arr_time').value,
+              flight_no: el('out_flight_no').value,
+              pnr: el('out_pnr').value
+            },
+            return: {
+              enabled: el('hasReturn').checked,
+              dep_city: el('ret_dep_city').value,
+              dep_date: el('ret_dep_date').value,
+              dep_time: el('ret_dep_time').value,
+              arr_city: el('ret_arr_city').value,
+              arr_date: el('ret_arr_date').value,
+              arr_time: el('ret_arr_time').value,
+              flight_no: el('ret_flight_no').value,
+              pnr: el('ret_pnr').value
+            }
+          },
+          transport: {
+            route: el('transport_route').value,
+            custom: el('custom_transport').value || '',
+            vehicle: el('transport_vehicle').value || ''
+          },
+          remarks: el('remarks').value
+        };
+        return data;
+      }
+
+      // Apply imported JSON data into form
+      function applyImportedVoucher(data){
+        if(!data) return;
+        // Basic validation & mapping
+        voucherNoEl.textContent = data.voucherNo || voucherNoEl.textContent;
+        pv_voucherNo.textContent = voucherNoEl.textContent;
+        issueDateEl.value = data.issueDate || issueDateEl.value;
+
+        travellers = Array.isArray(data.travellers) ? data.travellers.slice() : [];
+        hotels = Array.isArray(data.hotels) ? data.hotels.slice() : [];
+
+        // flights
+        if(data.flights && data.flights.outbound){
+          const o = data.flights.outbound;
+          el('out_dep_city').value = o.dep_city || '';
+          el('out_dep_date').value = o.dep_date || '';
+          el('out_dep_time').value = o.dep_time || '';
+          el('out_arr_city').value = o.arr_city || '';
+          el('out_arr_date').value = o.arr_date || '';
+          el('out_arr_time').value = o.arr_time || '';
+          el('out_flight_no').value = o.flight_no || '';
+          el('out_pnr').value = o.pnr || '';
+        }
+        if(data.flights && data.flights.return){
+          const r = data.flights.return;
+          el('hasReturn').checked = !!r.enabled;
+          toggleReturnBlock();
+          el('ret_dep_city').value = r.dep_city || '';
+          el('ret_dep_date').value = r.dep_date || '';
+          el('ret_dep_time').value = r.dep_time || '';
+          el('ret_arr_city').value = r.arr_city || '';
+          el('ret_arr_date').value = r.arr_date || '';
+          el('ret_arr_time').value = r.arr_time || '';
+          el('ret_flight_no').value = r.flight_no || '';
+          el('ret_pnr').value = r.pnr || '';
+        }
+
+        // transport
+        if (data.transport) {
+          el('transport_route').value = data.transport.route || 'Option 1';
+          toggleCustomRoute();
+          el('custom_transport').value = data.transport.custom || '';
+          el('transport_vehicle').value = data.transport.vehicle || 'Car';
+        }
+
+        // remarks
+        el('remarks').value = data.remarks || '';
+
+        // re-render
+        renderTravellersList();
+        renderHotels();
+        renderPreviewFromForm();
+      }
+
+      // Load sample voucher
+      function loadSample(){
+        const sample = {
+          voucherNo: "VCH-2025-0000",
+          issueDate: "2025-10-01",
+          travellers: [
+            { name:"Mr. Ali Khan", passport:"AB1234567", visa:"VISA998", visa_issue:"2025-09-01" }
+          ],
+          hotels: [
+            { name:"Makkah Tower", city:"Makkah", checkin:"2025-10-10", checkout:"2025-10-15", nights:"5", rooms:"2", room_type:"Double", rate:"250", total:"2500", notes:"Breakfast included" }
+          ],
+          flights: {
+            outbound: {
+              dep_city:"Karachi", dep_date:"2025-10-10", dep_time:"03:00",
+              arr_city:"Jeddah", arr_date:"2025-10-10", arr_time:"05:30",
+              flight_no:"PK-741", pnr:"ABC123"
+            },
+            return: {
+              enabled:true,
+              dep_city:"Jeddah", dep_date:"2025-10-20", dep_time:"12:00",
+              arr_city:"Karachi", arr_date:"2025-10-20", arr_time:"15:00",
+              flight_no:"PK-742", pnr:"XYZ789"
+            }
+          },
+          transport: {
+            route:"Option 1",
+            custom:"",
+            vehicle:"Coaster"
+          },
+          remarks:"Group Umrah package voucher"
+        };
+        applyImportedVoucher(sample);
+      }
+
+      // Download PDF
+function downloadPdf(){
+  try {
+    const element = document.getElementById('voucherPreview');
+    if (!element) {
+      alert('Voucher preview not found. Please generate preview first.');
+      return;
+    }
+    
+    const opt = {
+      margin: 0.5,
+      filename: (pv_voucherNo.textContent || 'voucher') + '.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+    };
+    
+    // Show loading indicator
+    const originalText = el('btnPdf').textContent;
+    el('btnPdf').textContent = 'Generating PDF...';
+    el('btnPdf').disabled = true;
+    
+    html2pdf().set(opt).from(element).save().finally(() => {
+      // Restore button state
+      el('btnPdf').textContent = originalText;
+      el('btnPdf').disabled = false;
+    });
+    
+  } catch (error) {
+    console.error('PDF generation failed:', error);
+    alert('Failed to generate PDF. Please try again.');
+    el('btnPdf').textContent = 'Download PDF';
+    el('btnPdf').disabled = false;
+  }
+}
+
+      // Escape HTML to prevent injection
+      function escapeHtml(text){
+        if (!text) return '';
+        return text.replace(/[&<>"']/g, function(m){
+          return ({
+            '&':'&amp;',
+            '<':'&lt;',
+            '>':'&gt;',
+            '"':'&quot;',
+            "'":'&#39;'
+          })[m];
+        });
+      }
+
+      // Initialize on page load
+      window.addEventListener('DOMContentLoaded', init);
+    </script>
+  </body>
+  </html>

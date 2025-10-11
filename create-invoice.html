@@ -1,0 +1,1337 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Trip Again Pvt Ltd — Invoice Generator</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    .client-fields {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .client-fields > div {
+      flex: 1 1 180px;
+      min-width: 0;
+    }
+    .client-fields input[type="text"] {
+      width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+    }
+    /* ...existing code... */
+    .logo-shadow {
+      position: relative;
+      width: 64px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo-shadow img {
+      width: 64px;
+      height: 64px;
+      display: block;
+      z-index: 2;
+      background: transparent !important;
+      border-radius: 12px;
+      box-shadow: none;
+    }
+    .plane-shadow {
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      bottom: 6px;
+      height: 18px;
+      border-radius: 50%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 100%);
+      z-index: 1;
+      filter: blur(2px);
+      pointer-events: none;
+    }
+    :root{
+      --brand-red: #d62828;
+      --brand-black: #000;
+      --brand-white: #fff;
+      --brand-gray: #f3f3f3;
+      --accent: #222;
+    }
+    body{
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      background: #efefef;
+      margin: 20px;
+      color: #222;
+    }
+    .app {
+      max-width: 950px;
+      margin: 20px auto;
+    }
+    .card {
+      background: var(--brand-white);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    }
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px;
+      align-items: center;
+      background: var(--brand-black);
+      color: var(--brand-white);
+    }
+    .toolbar .left, .toolbar .right { display:flex; gap:10px; align-items:center; }
+    .btn {
+      display: inline-block;
+      padding: 10px 14px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+    .btn.primary { background: var(--brand-red); color: #fff; border: 1px solid rgba(0,0,0,0.08); }
+    .btn.ghost { background: #fff; color: var(--brand-red); border: 1px solid var(--brand-red); }
+    .btn.ghost:hover { background: var(--brand-red); color: #fff; }
+    .btn.danger { background: #fff; color: var(--brand-red); border: 1px solid var(--brand-red); }
+    .btn.icon { padding: 8px 10px; }
+    .select, input[type="text"], input[type="number"], input[type="datetime-local"], input[type="date"], select {
+      padding:8px 10px; border-radius:6px; border:1px solid #ddd; font-size:13px; width:100%;
+    }
+    .invoice {
+      padding: 24px;
+      background: #fff;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 6px solid var(--brand-red);
+      padding: 32px 32px 20px 32px;
+      background: var(--brand-black);
+      color: #fff;
+      border-top-left-radius: 18px;
+      border-top-right-radius: 18px;
+      min-height: 90px;
+    }
+    .brand {
+      display:flex; gap:12px; align-items:center;
+    }
+    .brand img {
+      width:64px; height:64px; object-fit:contain; border-radius:12px; background:#fff;
+    }
+    .brand .title h1 {
+      margin:0;
+      font-size:28px;
+      letter-spacing:0.3px;
+      color: #fff;
+      white-space: nowrap;
+    }
+    .brand .title small {
+      display:block; font-size:13px; color:#fff; opacity:0.95; margin-top:3px;
+    }
+    .invoice-meta {
+      text-align:right;
+      font-size:13px;
+      color: #fff;
+    }
+    .invoice-meta .label { color:#fff; font-weight:600; }
+    .invoice-meta .value { display:block; margin-top:4px; font-weight:700; font-size:15px; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 18px;
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+    .panel {
+      background: #fff;
+      border-radius: 8px;
+      padding: 12px;
+      border: 1px solid #eee;
+      font-size: 13px;
+    }
+    .panel h3 { margin:0 0 8px 0; color:var(--brand-red); font-size:14px; }
+    .inline-row { display:flex; gap:8px; align-items:center; }
+    .small { font-size:12px; color:#666; }
+    .items-table {
+      width:100%;
+      border-collapse: collapse;
+      margin-top: 18px;
+      font-size:13px;
+    }
+    .items-table thead th {
+      background: var(--brand-black);
+      color:#fff;
+      padding:10px;
+      text-align:left;
+      font-weight:700;
+      border: 1px solid rgba(255,255,255,0.02);
+    }
+    .items-table tbody td {
+      padding:10px;
+      border-bottom:1px solid #eee;
+      vertical-align: top;
+    }
+    .muted { color:#666; font-size:12px; }
+    .right { text-align:right; }
+    .center { text-align:center; }
+    .summary {
+      margin-top:18px;
+      padding-right:12px;
+      display:flex;
+      justify-content:flex-end;
+      gap:8px;
+    }
+    .summary .box {
+      min-width:280px;
+      background: #fafafa;
+      border: 1px solid #f0f0f0;
+      padding:12px;
+      padding-right:24px;
+      border-radius:8px;
+      font-size:13px;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      padding-right: 12px;
+    }
+    .summary-row.total { font-weight:800; font-size:16px; color:var(--brand-black); }
+.footer {
+  margin-top: 24px !important;
+  margin-bottom: 10px !important;
+  padding: 15px 20px 0 20px !important;
+  border-top: 1px dashed #eee !important;
+  font-size: 11px !important;
+  color: #666 !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  flex-wrap: nowrap !important;
+  gap: 20px !important;
+}
+
+.footer .left {
+  flex: 1 !important;
+  max-width: 60% !important;
+  min-width: 0 !important;
+}
+
+.footer .right {
+  flex-shrink: 0 !important;
+  min-width: 180px !important;
+  max-width: 55% !important;
+  text-align: right !important;
+}
+    .add-panel {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 12px;
+      border-top: 1px solid #fafafa;
+      background: #fff;
+      border-radius: 0 0 8px 8px;
+      flex-wrap: wrap;
+    }
+    #categoryFields {
+      flex: 3;
+      display: flex;
+      gap: 30px;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+    .field.small {
+      flex: 1 1 120px;
+      min-width: 120px;
+      max-width: 140px;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1 1 180px;
+      min-width: 140px;
+    }
+    .items-actions { display:flex; gap:8px; align-items:center; }
+    #terms {
+      margin:24px 0 0 0; font-size:12px; color:#444; background:#f3f3f3; border-radius:8px; padding:14px; border:1px solid #eee;
+    }
+    #terms strong { color: var(--brand-red);}
+/* --- ENHANCED MOBILE RESPONSIVE ENHANCEMENTS --- */
+@media (max-width: 900px) {
+  .add-panel, #categoryFields {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+  .field, .field.small {
+    min-width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 1 100% !important;
+  }
+}
+
+@media (max-width: 800px) {
+  .grid {
+    grid-template-columns: 1fr;
+    padding-left: 8px;
+    padding-right: 8px;
+    gap: 10px;
+  }
+  
+  .brand img { 
+    width: 48px; 
+    height: 48px; 
+  }
+  
+  .brand .title h1 {
+    font-size: 20px !important;
+    white-space: normal !important;
+    line-height: 1.2;
+    word-break: break-word;
+  }
+  
+  .brand .title small {
+    font-size: 11px;
+  }
+  
+  .invoice-meta { 
+    text-align: right; 
+    font-size: 12px;
+  }
+  
+  .invoice-meta .value {
+    font-size: 13px;
+  }
+  
+  .summary .box { 
+    min-width: 90vw; 
+    padding: 10px;
+  }
+  
+  .panel { 
+    padding: 10px; 
+    font-size: 12px;
+  }
+  
+  /* Enhanced header layout for mobile */
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 20px 16px 14px 16px !important;
+    min-height: auto !important;
+  }
+  
+  .brand {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    width: 100%;
+  }
+  
+  .invoice-meta {
+    width: 100%;
+    text-align: left !important;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Enhanced table responsiveness */
+  .items-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    font-size: 12px;
+  }
+  
+  .items-table thead {
+    display: table-header-group;
+  }
+  
+  .items-table tbody {
+    display: table-row-group;
+  }
+  
+  .items-table th,
+  .items-table td {
+    min-width: 80px;
+    padding: 8px 6px;
+  }
+  
+  /* Stack summary inputs properly */
+  .summary .box {
+    min-width: 0;
+    width: 100%;
+    padding: 12px;
+  }
+  
+  .summary-row {
+    flex-direction: column;
+    gap: 4px;
+    align-items: stretch;
+  }
+  
+  .summary-row .right {
+    text-align: left;
+  }
+  
+  .summary .box input[type="number"],
+  .summary .box input[type="date"],
+  .summary .box select {
+    width: 100% !important;
+    max-width: none !important;
+  }
+}
+
+@media (max-width: 600px) {
+  body {
+    margin: 10px !important;
+    font-size: 14px;
+  }
+  
+  .app {
+    margin: 10px auto;
+  }
+  
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 8px;
+  }
+  
+  .toolbar .left, .toolbar .right {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+  
+  .btn, .select {
+    width: 100%;
+    min-width: 0;
+    font-size: 14px;
+    padding: 12px 10px;
+    min-height: 44px; /* Better touch targets */
+  }
+  
+  /* Enhanced client fields for mobile */
+  .client-fields {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .client-fields > div {
+    min-width: 100%;
+    flex: 1 1 100%;
+  }
+  
+  /* Footer mobile optimization */
+  .footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 8px 0 8px;
+    font-size: 11px;
+  }
+  
+  .footer .left, .footer .right {
+    max-width: 100%;
+    min-width: 0;
+    padding-right: 0;
+    width: 100%;
+    justify-content: flex-start !important;
+  }
+  
+  .footer .right {
+    text-align: left !important;
+  }
+  
+  /* Terms mobile optimization */
+  #terms {
+    margin: 20px 0 0 0;
+    padding: 12px;
+    font-size: 11px;
+  }
+  
+  #terms ul {
+    margin: 6px 0 0 12px;
+    padding: 0;
+  }
+  
+  /* Add panel mobile optimization */
+  .add-panel {
+    padding: 10px;
+    gap: 8px;
+    flex-direction: column;
+  }
+  
+  #categoryFields {
+    gap: 8px;
+    width: 100%;
+  }
+  
+  .field, .field.small {
+    min-width: 100% !important;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Extra small screen optimizations */
+  .brand .title h1 {
+    font-size: 18px !important;
+  }
+  
+  .invoice-meta {
+    font-size: 11px;
+  }
+  
+  .header {
+    padding: 16px 12px 12px 12px !important;
+  }
+  
+  /* Enhanced table for very small screens */
+  .items-table {
+    font-size: 11px;
+  }
+  
+  .items-table thead th:nth-child(1) { min-width: 70px; } /* Category */
+  .items-table thead th:nth-child(2) { min-width: 120px; } /* Description */
+  .items-table thead th:nth-child(3) { min-width: 40px; } /* Qty */
+  .items-table thead th:nth-child(4) { min-width: 80px; } /* Unit Price */
+  .items-table thead th:nth-child(5) { min-width: 80px; } /* Total */
+  
+  /* Summary box mobile optimization */
+  .summary .box {
+    padding: 10px;
+  }
+  
+  .summary-row {
+    margin-bottom: 6px;
+  }
+  
+  /* Form inputs mobile optimization */
+  input[type="text"], 
+  input[type="number"], 
+  input[type="datetime-local"], 
+  input[type="date"], 
+  select {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+    padding: 12px 8px;
+    min-height: 44px; /* Better touch targets */
+  }
+    /* Footer mobile optimization */
+  .footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 8px 0 8px;
+    font-size: 11px;
+  }
+  
+  .footer .left, .footer .right {
+    max-width: 100%;
+    min-width: 0;
+    padding-right: 0;
+    width: 100%;
+    justify-content: flex-start !important;
+  }
+  
+  .footer .right {
+    text-align: left !important;
+  }
+}
+
+@media (max-width: 360px) {
+  /* Ultra-small screen optimizations */
+  .brand img {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .brand .title h1 {
+    font-size: 16px !important;
+  }
+  
+  .items-table {
+    font-size: 10px;
+  }
+  
+  .items-table th,
+  .items-table td {
+    padding: 6px 4px;
+  }
+}
+
+/* Improve touch targets for mobile */
+@media (hover: none) and (pointer: coarse) {
+  .btn {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .items-table .btnDel {
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 16px;
+  }
+  
+  /* Ensure all interactive elements are touch-friendly */
+  .select, 
+  input[type="text"], 
+  input[type="number"], 
+  input[type="datetime-local"], 
+  input[type="date"], 
+  select {
+    min-height: 44px;
+  }
+}
+
+
+.app {
+  width: 950px;
+  max-width: 100%;
+}
+/* Adjust grid layout when left column is hidden */
+.grid > div:first-child:not([style*="display: none"]) ~ div {
+    grid-column: 1 / -1;
+}
+
+/* Smooth transitions */
+.grid > div {
+    transition: all 0.3s ease;
+}
+   @media print {
+  html, body {
+    width: 100%;
+    height: 297mm;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+  
+  .app, .card, .invoice {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+  
+  /* FIX HEADER LAYOUT - KEEP BRAND AND META SIDE BY SIDE */
+  .header {
+    border-radius: 8px !important;
+    padding: 12px 18px 8px 18px !important;
+    min-height: 60px !important;
+    display: flex !important;
+    flex-direction: row !important; /* Force row layout */
+    justify-content: space-between !important; /* Keep items on opposite sides */
+    align-items: center !important; /* Vertically center align */
+  }
+  
+  /* Prevent mobile styles from overriding in print */
+  .header .brand {
+    flex-direction: row !important; /* Keep brand items in row */
+    align-items: center !important;
+    gap: 12px !important;
+    width: auto !important;
+  }
+  
+  /* Force invoice meta to stay on right */
+  .invoice-meta {
+    text-align: right !important;
+    width: auto !important;
+    flex-shrink: 0 !important;
+  }
+  
+  /* Reduce brand logo size for print */
+  .brand img {
+    width: 48px !important;
+    height: 48px !important;
+  }
+  
+  /* Reduce brand text size */
+  .brand .title h1 { 
+    font-size: 18px !important;
+    margin: 0 !important;
+    white-space: nowrap !important; /* Prevent wrapping */
+  }
+  
+  .brand .title small {
+    font-size: 11px !important;
+    margin-top: 2px !important;
+  }
+  
+  /* Reduce invoice meta text size */
+  .invoice-meta {
+    font-size: 11px !important;
+  }
+  
+  .invoice-meta .value {
+    font-size: 13px !important;
+    margin-top: 2px !important;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+  
+  .invoice {
+    margin-top: 0 !important;
+  }
+  
+  /* KEEP SUMMARY ON RIGHT IN PRINT */
+  .summary {
+    justify-content: flex-end !important;
+    padding-right: 12px !important;
+    width: 100% !important;
+  }
+  
+  .summary .box {
+    margin-left: auto !important;
+    margin-right: 0 !important;
+    width: auto !important;
+    min-width: 280px !important;
+  }
+    /* Hide elements that are set to display:none */
+    .grid > div[style*="display: none"] {
+        display: none !important;
+    }
+    
+    /* Make right column full width when left is hidden */
+    .grid > div:first-child[style*="display: none"] ~ div {
+        grid-column: 1 / -1 !important;
+    }
+}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="card">
+      <!-- TOP TOOLBAR -->
+      <div class="toolbar no-print">
+        <div class="left">
+          <button class="btn primary" id="btnAddItem">+ Add Item</button>
+          <button class="btn ghost" id="btnClear">Clear All</button>
+          <select id="currencySelect" class="select" style="width:120px;">
+            <option value="PKR">PKR (₨)</option>
+            <option value="USD">USD ($)</option>
+            <option value="SAR">SAR (﷼)</option>
+            <option value="AED">AED (درهم)</option>
+            <option value="EUR">EUR (€)</option>
+          </select>
+        </div>
+        <div class="right">
+          <button class="btn ghost" id="btnPreview">Preview Invoice</button>
+          <button class="btn" id="btnPrint" style="background:#111;color:#fff;">Print</button>
+          <button class="btn primary" id="btnPdf">Download PDF</button>
+        </div>
+      </div>
+      <!-- PRINTABLE INVOICE -->
+      <div id="invoiceRoot" class="invoice" role="region" aria-label="Invoice printable area">
+        <!-- HEADER -->
+        <div class="header">
+          <div class="brand">
+            <div class="logo-shadow">
+              <img id="brandLogo" src="Trip Again Logo Icon.svg" alt="Trip Again Logo" />
+              <div class="plane-shadow"></div>
+            </div>
+            <div class="title">
+              <h1>Trip Again Pvt Ltd</h1>
+              <small>Your Travel Companion</small>
+            </div>
+          </div>
+          <div class="invoice-meta">
+            <div class="label">Invoice No.</div>
+            <div class="value" id="invoiceNo">INV-2025-0001</div>
+            <div class="label" style="margin-top:8px;">Date Issued</div>
+            <div class="value" id="invoiceDateDisplay"></div>
+          </div>
+        </div>
+        <!-- MAIN GRID -->
+        <div class="grid">
+          <!-- Left Column: Booking / Flight / Passenger summary -->
+          <div>
+            <div class="panel">
+              <h3>Booking / Flight Summary</h3>
+              <div id="flightSummary" class="small muted">
+                No flights added yet.
+              </div>
+            </div>
+            <div class="panel" style="margin-top:12px;">
+              <h3>Passenger Summary</h3>
+              <div id="passengerSummary" class="small muted">No passengers added.</div>
+            </div>
+          </div>
+          <!-- Right Column: Client & Agent -->
+          <div>
+            <div class="panel">
+              <h3>Client Details</h3>
+              <div class="client-fields">
+                <div>
+                  <div class="muted">Client Name</div>
+                  <div><input id="clientName" type="text" placeholder="Client / Company Name" /></div>
+                </div>
+                <div>
+                  <div class="muted">Contact</div>
+                  <div><input id="clientContact" type="text" placeholder="Phone / Email" /></div>
+                </div>
+              </div>
+              <div class="client-fields" style="margin-top:10px;">
+                <div style="flex:1;">
+                  <div class="muted">Notes</div>
+                  <div><input id="notes" type="text" placeholder="Optional notes or booking reference" /></div>
+                </div>
+              </div>
+            </div>
+            <div class="panel" style="margin-top:12px;">
+              <h3>Agent</h3>
+              <div class="muted">Prepared by</div>
+              <div style="margin-top:6px;">Trip Again Pvt Ltd — Travel Services & Solutions</div>
+              <div style="margin-top:10px; font-size:13px;">
+                <div class="muted">Registered Office</div>
+                <div>Office #2, Ground Floor, Plot 263-C, PECHS Block 2, Karachi, Pakistan</div>
+                <div class="muted" style="margin-top:6px;">DTS & IATA Registered</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- ITEMS TABLE -->
+        <table class="items-table" aria-describedby="items-description">
+          <thead>
+            <tr>
+              <th style="width:16%">Category</th>
+              <th>Description</th>
+              <th style="width:10%" class="center">Qty</th>
+              <th style="width:16%" class="right">Unit Price</th>
+              <th style="width:16%" class="right">Total</th>
+              <th style="width:8%" class="center no-print">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="itemsBody">
+            <!-- JS will insert rows -->
+          </tbody>
+        </table>
+        <!-- SUMMARY -->
+        <div class="summary">
+          <div class="box">
+            <div class="summary-row"><div>Sub Total</div><div id="subTotal" class="right">PKR 0</div></div>
+            <div class="summary-row">
+            <div>Discount (Amount)</div>
+            <div><input id="discountInput" type="number" min="0" value="0" style="width:90px;" /></div>
+            </div>
+            <div class="summary-row">
+            <div>Tax (%)</div>
+            <div><input id="taxInput" type="number" min="0" value="0" step="0.01" style="width:90px;" /></div>
+            </div>
+            <div class="summary-row total"><div>Grand Total</div><div id="grandTotal" class="right">PKR 0</div></div>
+            <hr style="margin:10px 0;">
+            <div class="summary-row"><div>Payment Status</div>
+              <div>
+                <select id="paymentStatus" style="padding:2px 8px;">
+                  <option>Unpaid</option>
+                  <option>Paid</option>
+                  <option>Partial</option>
+                </select>
+              </div>
+            </div>
+            <div class="summary-row"><div>Advance Paid</div><div><input id="advancePaid" type="number" min="0" value="0" style="width:70px;" /></div></div>
+            <div class="summary-row"><div><strong>Balance Due</strong></div><div id="balanceDue" class="right">PKR 0</div></div>
+            <div class="summary-row"><div>Due Date</div><div><input id="dueDate" type="date" /></div></div>
+          </div>
+        </div>
+<!-- FOOTER -->
+<div class="footer">
+  <div class="left">
+    <strong style="color:#d62828;">Trip Again Pvt Ltd</strong> — <span style="color:#111;">Your Travel Companion</span> <br>
+    Office #2, Ground Floor, Plot 263-C, PECHS Block 2, Karachi, Pakistan <br>
+    📧 info@tripagainp.pk | ☎ +92 333 3473348 | 🌐 <a href="https://www.tripagainp.pk" target="_blank">www.tripagainp.pk</a>
+  </div>
+  <div class="right muted">
+    <div>Facebook: Trip Again Travel & Tours</div>
+    <div>WhatsApp: +92 333 3473348</div>
+    <div style="margin-top:8px; font-size:11px;">This invoice is computer generated and does not require a signature.</div>
+    <div style="margin-top:4px; font-size:11px;">This Invoice Engine is Developed by <strong>GroTech Solutions</strong>.</div>
+  </div>
+</div>
+        <!-- TERMS & POLICIES -->
+        <div id="terms">
+          <strong>Terms & Policies:</strong>
+          <ul style="margin:8px 0 0 18px; padding:0;">
+            <li>Client is responsible for providing correct travel details and documents.</li>
+            <li>All bookings are subject to airline, hotel, and embassy policies — agency service charges are non-refundable.</li>
+            <li>Trip Again Pvt Ltd acts as an agent and is not responsible for delays, cancellations, or changes by third-party providers.</li>
+            <li>Visa approval is at the sole discretion of the embassy/consulate.</li>
+            <li>Payments must be made only to official company accounts.</li>
+            <li>For full terms, visit <a href="https://www.tripagainp.pk/terms" target="_blank">tripagainp.pk/terms</a>.</li>
+          </ul>
+        </div>
+      </div>
+      <!-- ADD ITEM PANEL -->
+      <div class="add-panel no-print" id="addPanel" style="display:none;">
+        <div style="flex:1; min-width:140px;">
+          <div class="muted">Category</div>
+          <select id="itemCategory" class="select">
+            <option value="ticket">Ticket Sale</option>
+            <option value="visa">Visa Sale</option>
+            <option value="hotel">Hotel</option>
+            <option value="service">Service</option>
+            <option value="package">Tourism Package</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <!-- Dynamic fields container -->
+        <div id="categoryFields">
+          <!-- JS injects inputs for the selected category -->
+        </div>
+        <div style="display:flex; flex-direction:column; justify-content:flex-end; align-items:stretch; gap:08px; margin-left:16px; min-width:120px; margin-top: 30px; margin-right: 20px;">
+          <button class="btn ghost" id="btnCancelAdd">Cancel</button>
+          <button class="btn primary" id="btnConfirmAdd">Add to Invoice</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    // --- Currency logic ---
+    const currencySelect = document.getElementById('currencySelect');
+    let currentCurrency = 'PKR';
+    const currencySymbols = { PKR: '₨', USD: '$', SAR: '﷼', AED: 'درهم', EUR: '€' };
+    // --- Invoice logic ---
+    const items = [];
+    const itemsBody = document.getElementById('itemsBody');
+    const subTotalEl = document.getElementById('subTotal');
+    const grandTotalEl = document.getElementById('grandTotal');
+    const discountInput = document.getElementById('discountInput');
+    const taxInput = document.getElementById('taxInput');
+    const flightSummary = document.getElementById('flightSummary');
+    const passengerSummary = document.getElementById('passengerSummary');
+    const invoiceNoEl = document.getElementById('invoiceNo');
+    const invoiceDateDisplay = document.getElementById('invoiceDateDisplay');
+    const clientNameInput = document.getElementById('clientName');
+    const clientContactInput = document.getElementById('clientContact');
+    const notesInput = document.getElementById('notes');
+    const addPanel = document.getElementById('addPanel');
+    const btnAddItem = document.getElementById('btnAddItem');
+    const btnCancelAdd = document.getElementById('btnCancelAdd');
+    const btnConfirmAdd = document.getElementById('btnConfirmAdd');
+    const itemCategory = document.getElementById('itemCategory');
+    const categoryFields = document.getElementById('categoryFields');
+    const btnClear = document.getElementById('btnClear');
+    const btnPrint = document.getElementById('btnPrint');
+    const btnPdf = document.getElementById('btnPdf');
+    const btnPreview = document.getElementById('btnPreview');
+    const paymentStatus = document.getElementById('paymentStatus');
+    const advancePaidInput = document.getElementById('advancePaid');
+    const balanceDueEl = document.getElementById('balanceDue');
+    const dueDateInput = document.getElementById('dueDate');
+
+    // --- INIT ---
+    function init() {
+      // invoice number from localStorage or start
+      let counter = parseInt(localStorage.getItem('invoiceCounter')||'1',10);
+      const year = new Date().getFullYear();
+      invoiceNoEl.textContent = `INV-${year}-${String(counter).padStart(4,'0')}`;
+      invoiceDateDisplay.textContent = new Date().toLocaleDateString();
+      localStorage.setItem('invoiceCounter', String(counter + 1));
+      btnAddItem.addEventListener('click', showAddPanel);
+      itemCategory.addEventListener('change', () => renderCategoryFields(itemCategory.value));
+      btnCancelAdd.addEventListener('click', hideAddPanel);
+      btnConfirmAdd.addEventListener('click', addItemFromPanel);
+      btnClear.addEventListener('click', clearAll);
+      btnPrint.addEventListener('click', () => window.print());
+      btnPdf.addEventListener('click', downloadPdf);
+      btnPreview.addEventListener('click', () => invoiceRoot.scrollIntoView({behavior:'smooth'}));
+      currencySelect.addEventListener('change', () => {
+        currentCurrency = currencySelect.value;
+        renderItems();
+        renderSummary();
+      });
+      advancePaidInput.addEventListener('input', renderSummary);
+      paymentStatus.addEventListener('change', renderSummary);
+      renderCategoryFields(itemCategory.value);
+      renderItems();
+      discountInput.addEventListener('input', renderSummary);
+      taxInput.addEventListener('input', renderSummary);
+    }
+    // --- Add Item Modal ---
+function showAddPanel(){
+    addPanel.style.display = 'flex';
+    // REMOVE the duplicate event listener code here
+    window.scrollTo({top: document.body.scrollHeight, behavior:'smooth'});
+}
+    function hideAddPanel(){
+      addPanel.style.display = 'none';
+      clearCategoryInputs();
+    }
+    function clearCategoryInputs(){
+      categoryFields.innerHTML = '';
+    }
+    function renderCategoryFields(cat){
+      categoryFields.innerHTML = '';
+      if(cat === 'ticket'){
+        categoryFields.innerHTML = `
+          <div class="field small">
+            <label class="muted">Passenger Name</label>
+            <input id="f_passenger" type="text" placeholder="Full name" />
+          </div>
+          <div class="field small">
+            <label class="muted">Flight No</label>
+            <input id="f_flight" type="text" placeholder="e.g. PK-123" />
+          </div>
+          <div class="field small">
+            <label class="muted">Departure Details</label>
+            <input id="f_dep" type="datetime-local" />
+          </div>
+          <div class="field small">
+            <label class="muted">From → To</label>
+            <input id="f_route" type="text" placeholder="From City - To City" />
+          </div>
+          <div class="field small">
+            <label class="muted">Qty (tickets)</label>
+            <input id="f_qty" type="number" min="1" value="1" />
+          </div>
+          <div class="field small">
+            <label class="muted">Unit Price</label>
+            <input id="f_price" type="number" min="0" value="0" />
+          </div>
+        `;
+      } else if(cat === 'visa'){
+        categoryFields.innerHTML = `
+          <div class="field">
+            <label class="muted">Country</label>
+            <select id="v_country">
+              <option>Saudi Arabia (Umrah)</option>
+              <option>Dubai</option>
+              <option>Abu Dhabi</option>
+              <option>Sharjah</option>
+              <option>Malaysia</option>
+              <option>Thailand</option>
+              <option>Indonesia</option>
+              <option>Singapore</option>
+              <option>China</option>
+              <option>Japan</option>
+              <option>Turkey</option>
+              <option>Cambodia</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="muted">Visa Type</label>
+            <select id="v_type">
+              <option>Tourist 30 Days</option>
+              <option>Tourist 60 Days</option>
+              <option>Tourist 90 Days</option>
+              <option>Tourist 05 Year</option>
+              <option>Business</option>
+              <option>Transit 96 Hours</option>
+              <option>Transit 48 Hours</option>
+              <option>Work</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field small">
+            <label class="muted">Qty</label>
+            <input id="v_qty" type="number" min="1" value="1" />
+          </div>
+          <div class="field small">
+            <label class="muted">Unit Price</label>
+            <input id="v_price" type="number" min="0" value="0" />
+          </div>
+        `;
+      } else if(cat === 'hotel'){
+    categoryFields.innerHTML = `
+        <div class="field">
+            <label class="muted">Hotel / City</label>
+            <input id="h_name" type="text" placeholder="Hotel name - City" />
+        </div>
+        <div class="field small">
+            <label class="muted">Check-in</label>
+            <input id="h_checkin" type="date" />
+        </div>
+        <div class="field small">
+            <label class="muted">Check-Out</label>
+            <input id="h_checkout" type="date" />
+        </div>
+        <div class="field small">
+            <label class="muted">No of Rooms</label>
+            <input id="h_rooms" type="number" min="1" value="1" />
+        </div>                    
+        <div class="field small">
+            <label class="muted">Nights</label>
+            <input id="h_nights" type="number" min="1" value="1" readonly style="background-color:#f5f5f5; cursor:not-allowed;" />
+        </div>
+        <div class="field small">
+            <label class="muted">Rate per Night</label>
+            <input id="h_price" type="number" min="0" value="0" />
+        </div>
+    `;
+    
+    // Add event listeners to auto-calculate nights
+    document.getElementById('h_checkin').addEventListener('change', calculateNights);
+    document.getElementById('h_checkout').addEventListener('change', calculateNights);
+} else if(cat === 'service'){
+        categoryFields.innerHTML = `
+          <div class="field">
+            <label class="muted">Service Description</label>
+            <input id="s_desc" type="text" placeholder="Case preparation, documentation, transfer etc." />
+          </div>
+          <div class="field small">
+            <label class="muted">Qty</label>
+            <input id="s_qty" type="number" min="1" value="1" />
+          </div>
+          <div class="field small">
+            <label class="muted">Unit Price</label>
+            <input id="s_price" type="number" min="0" value="0" />
+          </div>
+        `;
+      } else if(cat === 'package'){
+        categoryFields.innerHTML = `
+          <div class="field">
+            <label class="muted">Package Name / Destination</label>
+            <input id="p_name" type="text" placeholder="e.g. Dubai Weekend Package" />
+          </div>
+          <div class="field small">
+            <label class="muted">Days/Nights</label>
+            <input id="p_days" type="text" placeholder="3D/2N" />
+          </div>
+          <div class="field small">
+            <label class="muted">Qty</label>
+            <input id="p_qty" type="number" min="1" value="1" />
+          </div>
+          <div class="field small">
+            <label class="muted">Unit Price</label>
+            <input id="p_price" type="number" min="0" value="0" />
+          </div>
+        `;
+      } else {
+        categoryFields.innerHTML = `
+          <div class="field">
+            <label class="muted">Description</label>
+            <input id="o_desc" type="text" placeholder="Description" />
+          </div>
+          <div class="field small">
+            <label class="muted">Qty</label>
+            <input id="o_qty" type="number" min="1" value="1" />
+          </div>
+          <div class="field small">
+            <label class="muted">Unit Price</label>
+            <input id="o_price" type="number" min="0" value="0" />
+          </div>
+        `;
+      }
+    }
+function addItemFromPanel(){
+    const cat = itemCategory.value;
+    
+    // Basic validation for all categories
+    if (cat === 'ticket' && !document.getElementById('f_passenger').value) {
+        alert('Please enter passenger name');
+        return;
+    }
+    if (cat === 'visa' && (!document.getElementById('v_country').value || !document.getElementById('v_type').value)) {
+        alert('Please select country and visa type');
+        return;
+    }
+    if (cat === 'hotel' && (!document.getElementById('h_checkin').value || !document.getElementById('h_checkout').value)) {
+        alert('Please select check-in and check-out dates');
+        return;
+    }
+    if (cat === 'hotel' && !document.getElementById('h_name').value) {
+        alert('Please enter hotel name');
+        return;
+    }
+    if (cat === 'service' && !document.getElementById('s_desc').value) {
+        alert('Please enter service description');
+        return;
+    }
+    if (cat === 'package' && !document.getElementById('p_name').value) {
+        alert('Please enter package name');
+        return;
+    }
+    if (cat === 'other' && !document.getElementById('o_desc').value) {
+        alert('Please enter description');
+        return;
+    }
+
+    let item = { category: cat, desc: '', qty: 1, unit: 0, total: 0, details: {} };
+    
+    if(cat === 'ticket'){
+        item.desc = `${document.getElementById('f_passenger').value} | ${document.getElementById('f_flight').value} | ${document.getElementById('f_route').value} | ${document.getElementById('f_dep').value}`;
+        item.qty = parseInt(document.getElementById('f_qty').value)||1;
+        item.unit = parseFloat(document.getElementById('f_price').value)||0;
+    } else if(cat === 'visa'){
+        item.desc = `${document.getElementById('v_country').value} | ${document.getElementById('v_type').value}`;
+        item.qty = parseInt(document.getElementById('v_qty').value)||1;
+        item.unit = parseFloat(document.getElementById('v_price').value)||0;
+    } else if(cat === 'hotel'){
+        const checkin = new Date(document.getElementById('h_checkin').value);
+        const checkout = new Date(document.getElementById('h_checkout').value);
+        const nights = Math.ceil((checkout - checkin) / (1000 * 60 * 60 * 24));
+        const rooms = parseInt(document.getElementById('h_rooms').value) || 1;
+        const rate = parseFloat(document.getElementById('h_price').value) || 0;
+        
+        item.desc = `${document.getElementById('h_name').value} | Check-in: ${document.getElementById('h_checkin').value} | Nights: ${nights} | Rooms: ${rooms}`;
+        item.qty = nights;
+        item.unit = rate * rooms;
+    } else if(cat === 'service'){
+        item.desc = document.getElementById('s_desc').value;
+        item.qty = parseInt(document.getElementById('s_qty').value)||1;
+        item.unit = parseFloat(document.getElementById('s_price').value)||0;
+    } else if(cat === 'package'){
+        item.desc = `${document.getElementById('p_name').value} | ${document.getElementById('p_days').value}`;
+        item.qty = parseInt(document.getElementById('p_qty').value)||1;
+        item.unit = parseFloat(document.getElementById('p_price').value)||0;
+    } else {
+        item.desc = document.getElementById('o_desc').value;
+        item.qty = parseInt(document.getElementById('o_qty').value)||1;
+        item.unit = parseFloat(document.getElementById('o_price').value)||0;
+    }
+    
+    // CRITICAL: Price validation for ALL categories
+    if (item.unit <= 0) {
+        alert('Please enter a valid price greater than 0');
+        return;
+    }
+    
+    item.total = item.qty * item.unit;
+    items.push(item);
+    hideAddPanel();
+    renderItems();
+    renderSummary();
+}
+function calculateNights() {
+    const checkin = document.getElementById('h_checkin');
+    const checkout = document.getElementById('h_checkout');
+    const nightsField = document.getElementById('h_nights');
+    
+    if (checkin.value && checkout.value) {
+        const start = new Date(checkin.value);
+        const end = new Date(checkout.value);
+        
+        // Add validation
+        if (end <= start) {
+            nightsField.value = 1;
+            alert('Check-out date must be after check-in date');
+            return;
+        }
+        
+        const nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+        nightsField.value = nights > 0 ? nights : 1;
+    }
+}
+function renderItems(){
+    itemsBody.innerHTML = '';
+    if(items.length === 0){
+        itemsBody.innerHTML = `<tr><td colspan="6" class="center muted">No items added yet.</td></tr>`;
+    } else {
+        items.forEach((item, idx) => {
+            itemsBody.innerHTML += `
+            <tr>
+                <td>${capitalize(item.category)}</td>
+                <td>${item.desc}</td>
+                <td class="center">${item.qty}</td>
+                <td class="right">${formatCurrency(item.unit)}</td>
+                <td class="right">${formatCurrency(item.total)}</td>
+                <td class="center no-print">
+                <button class="btn danger btnDel" data-idx="${idx}" title="Remove">&#10006;</button>
+                </td>
+            </tr>
+            `;
+        });
+    }
+    // Remove handlers
+    document.querySelectorAll('.btnDel').forEach(btn => {
+        btn.onclick = function(){ items.splice(this.dataset.idx,1); renderItems(); renderSummary(); };
+    });
+    renderSummary();
+    renderFlightPassengerSummary(); // ← MAKE SURE THIS LINE IS HERE
+}
+function renderFlightPassengerSummary(){
+    // Find all ticket items
+    const flights = items.filter(i => i.category === 'ticket');
+    const flightPanel = document.querySelector('#flightSummary').closest('.panel').parentElement;
+    
+    if (flights.length) {
+        // Show the flight summary section
+        flightPanel.style.display = 'block';
+        flightSummary.innerHTML = flights.map(f => `<div>${f.desc}</div>`).join('');
+        
+        // Show the passenger summary section
+        const passengerPanel = document.querySelector('#passengerSummary').closest('.panel').parentElement;
+        passengerPanel.style.display = 'block';
+        passengerSummary.innerHTML = flights.map(f => `<div>${f.desc.split('|')[0].trim()}</div>`).join('');
+    } else {
+        // Hide both sections when no flights
+        flightPanel.style.display = 'none';
+        const passengerPanel = document.querySelector('#passengerSummary').closest('.panel').parentElement;
+        passengerPanel.style.display = 'none';
+    }
+}
+function formatCurrency(amount){
+    let symbol = currencySymbols[currentCurrency] || '';
+    let formatted = amount.toLocaleString(undefined, {minimumFractionDigits:2});
+    return `${symbol} ${formatted}`;
+}
+function renderSummary(){
+  let subTotal = items.reduce((sum, item) => sum + item.total, 0);
+  
+  // Get discount and tax values from inputs
+  let discountAmount = parseFloat(discountInput.value) || 0;
+  let taxRate = parseFloat(taxInput.value) || 0;
+  
+  // Calculate tax amount (on the amount after discount)
+  let taxableAmount = Math.max(subTotal - discountAmount, 0);
+  let taxAmount = (taxableAmount * taxRate) / 100;
+  
+  let grandTotal = taxableAmount + taxAmount;
+  let advance = parseFloat(advancePaidInput.value) || 0;
+  let balance = Math.max(grandTotal - advance, 0);
+  
+  // Update ONLY the elements that exist
+  subTotalEl.textContent = formatCurrency(subTotal);
+  grandTotalEl.textContent = formatCurrency(grandTotal);
+  balanceDueEl.textContent = formatCurrency(balance);
+  
+  // REMOVE these lines since we don't have discountEl and taxEl:
+  // discountEl.textContent = formatCurrency(discountAmount);
+  // taxEl.textContent = formatCurrency(taxAmount);
+}
+    function clearAll(){
+  if(confirm('Clear all invoice data?')){
+    items.length = 0;
+    discountInput.value = '0';
+    taxInput.value = '0';
+    renderItems();
+    renderSummary();
+  }
+}
+    function capitalize(str){ return str.charAt(0).toUpperCase() + str.slice(1);}
+    // --- PDF Download ---
+    function downloadPdf(){
+  let opt = {
+    margin:       0.2,
+    filename:     'TripAgain-Invoice.pdf',
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2, ignoreElements: (el) => el.classList && el.classList.contains('no-print') },
+    jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+  };
+  html2pdf().from(document.getElementById('invoiceRoot')).set(opt).save();
+}
+    // --- INIT ---
+    window.onload = init;
+  </script>
+</body>
+</html>
