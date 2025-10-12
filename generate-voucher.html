@@ -66,7 +66,7 @@
 
       /* Left: form, Right: preview */
       .panel {
-        background: var(--card-bg);
+        background: var(--d-bg);
         border-radius: 10px;
         padding: 14px;
         border:1px solid #eee;
@@ -160,7 +160,7 @@
   </head>
   <body>
     <div class="app">
-      <div class="card">
+      <div class="d">
         <div class="toolbar">
           <div class="left">
             <strong style="font-size:16px">Trip Again Pvt Ltd</strong>
@@ -331,12 +331,13 @@
               <div class="field">
                 <label>Vehicle Type</label>
                 <select id="transport_vehicle">
-                  <option>Car</option>
+                  <option></option>
                   <option>H1 Van</option>
                   <option>HiAce</option>
                   <option>Coaster</option>
                   <option>Bus</option>
                   <option>GMC / SUV</option>
+                  <option>Train</option>
                 </select>
               </div>
             </div>
@@ -453,7 +454,7 @@
                     <li>Voucher is non-transferable and has no cash value.</li>
                     <li>Cancellations or modifications are subject to supplier policy and fees.</li>
                     <li>Trip Again Pvt Ltd acts as an agent; not liable for third-party delays or cancellations.</li>
-                    <li>Traveller must carry valid passport & visa at all times.</li>
+                    <li>Traveller must ry valid passport & visa at all times.</li>
                     <li>Any incidental charges are payable by the guest at hotel check-in/out.</li>
                     <li>For full terms, contact Trip Again Pvt Ltd — info@tripagainp.pk.</li>
                   </ol>
@@ -937,7 +938,7 @@ el('btnGenerate').addEventListener('click', () => {
           el('transport_route').value = data.transport.route || 'Option 1';
           toggleCustomRoute();
           el('custom_transport').value = data.transport.custom || '';
-          el('transport_vehicle').value = data.transport.vehicle || 'Car';
+          el('transport_vehicle').value = data.transport.vehicle || '';
         }
 
         // remarks
@@ -1038,3 +1039,4 @@ function downloadPdf(){
     </script>
   </body>
   </html>
+
