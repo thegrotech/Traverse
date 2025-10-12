@@ -3,7 +3,7 @@
 <head>
     <script>// Redirect to login if user is not logged in
 if (localStorage.getItem('isLoggedIn') !== 'true') {
-  window.location.href = 'login.html';
+  window.location.href = 'index.html';
 }
 </script>
   <meta charset="utf-8" />
@@ -53,12 +53,13 @@ if (localStorage.getItem('isLoggedIn') !== 'true') {
   --glass-border: rgba(0,0,0,0.08);
   --color-scheme: light;
   --shadow-color: rgb(0, 0, 0);
+  --shadow: 0 8px 20px var(--shadow-color);
   
   /* Text colors for light theme */
   --text-primary: #1a202c;
   --text-secondary: #4a5568;
   --text-muted: #718096;
-  --shadow-color: rgba(0, 0, 0, 0.06);
+  --shadow-color: rgba(0, 0, 0, 0.534);
   --shadow: 0 8px 20px var(--shadow-color);
 }
 
@@ -140,7 +141,7 @@ if (localStorage.getItem('isLoggedIn') !== 'true') {
 
 /* Fix more tools icon color */
 .card .icon[style*="color:var(--muted)"] {
-  color: var(--text-muted) !important;
+  color: var(--text-secondary) !important;
 }
 
 /* Fix footer text colors */
@@ -277,7 +278,131 @@ if (localStorage.getItem('isLoggedIn') !== 'true') {
 
     /* subtle loading / skeleton for later */
     .skeleton { background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.03), rgba(255,255,255,0.02)); border-radius:8px; }
+/* ===== TEXT COLOR FIXES FOR LIGHT THEME ===== */
 
+/* Body and base text colors */
+body {
+  color: var(--text-primary);
+}
+
+/* Brand and header text */
+.brand-title .name {
+  color: var(--accent-2) !important;
+}
+
+.brand-title .subtitle {
+  color: var(--text-muted) !important;
+}
+
+/* Card text colors */
+.card .title {
+  color: var(--text-primary) !important;
+}
+
+.card .desc {
+  color: var(--text-secondary) !important;
+}
+
+/* Button text colors */
+.btn.primary {
+  color: white !important; /* Keep white text on colored buttons */
+}
+
+.btn.ghost {
+  color: var(--text-primary) !important;
+  border-color: var(--glass-border);
+}
+
+/* Icon buttons */
+.icon-btn {
+  color: var(--text-primary) !important;
+}
+
+.icon-btn:hover {
+  color: var(--accent-2) !important;
+}
+
+/* Search area */
+.search {
+  color: var(--text-secondary) !important;
+}
+
+.search input {
+  color: var(--text-primary) !important;
+}
+
+.search input::placeholder {
+  color: var(--text-muted) !important;
+}
+
+.search i {
+  color: var(--text-secondary) !important;
+}
+
+/* Panel and quick items */
+.panel h3 {
+  color: var(--text-primary) !important;
+}
+
+.quick-item > div:first-child > div:first-child {
+  color: var(--text-primary) !important;
+  font-weight: 700;
+}
+
+.quick-item > div:first-child > div:last-child {
+  color: var(--text-muted) !important;
+}
+
+/* Footer text */
+.foot {
+  color: var(--text-muted) !important;
+}
+
+.foot div:first-child {
+  color: var(--text-primary) !important;
+}
+
+/* Icons */
+.card .icon {
+  color: var(--accent-2) !important;
+}
+
+/* More tools card specific */
+#moreCard .icon {
+  color: var(--text-secondary) !important;
+}
+
+#moreCard .title {
+  color: var(--text-primary) !important;
+}
+
+#moreCard .desc {
+  color: var(--text-secondary) !important;
+}
+
+/* User profile icon container */
+.top-actions > div:last-child {
+  color: var(--text-primary) !important;
+}
+
+.top-actions > div:last-child .icon {
+  color: var(--text-primary) !important;
+}
+
+/* Soon badges */
+.soon {
+  color: var(--text-muted) !important;
+}
+
+/* Tip card text */
+.card .tip-text {
+  color: var(--text-primary) !important;
+}
+
+.card code {
+  color: var(--accent-2) !important;
+  background: var(--glass);
+}
   </style>
 </head>
 <body>
@@ -318,8 +443,8 @@ if (localStorage.getItem('isLoggedIn') !== 'true') {
     <main class="main" role="main">
       <section class="left">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-          <h2 style="margin:0;font-size:20px">Your Toolbox</h2>
-          <div style="color:var(--text-muted);font-size:13px">Quick access to essential tools</div>
+          <h2 style="margin:0;font-size:20px; color:var(--text-primary);">Your Toolbox</h2>
+          <div style="color:var(--text-primary);font-size:13px">Quick access to essential tools</div>
         </div>
 
         <div class="tools" id="toolsGrid">
@@ -334,8 +459,8 @@ if (localStorage.getItem('isLoggedIn') !== 'true') {
             </div>
 
             <div class="actions">
-              <button class="btn primary" data-action="invoice">Open</button>
-              <button class="btn ghost" onclick="copyHint(this,'invoice')">Copy ID</button>
+              <button class="btn primary" data-action="invoice" style="width: 75px;">Open</button>
+              
             </div>
             <div class="soon">v1.0</div>
           </article>
@@ -351,8 +476,8 @@ if (localStorage.getItem('isLoggedIn') !== 'true') {
             </div>
 
             <div class="actions">
-              <button class="btn primary" data-action="voucher">Open</button>
-              <button class="btn ghost" onclick="copyHint(this,'voucher')">Copy ID</button>
+              <button class="btn primary" data-action="voucher" style="width: 75px";>Open</button>
+              
             </div>
             <div class="soon">v1.0</div>
           </article>
@@ -368,8 +493,8 @@ if (localStorage.getItem('isLoggedIn') !== 'true') {
             </div>
 
             <div class="actions">
-              <button class="btn primary" data-action="umrah">Open</button>
-              <button class="btn ghost" onclick="copyHint(this,'umrah')">Copy ID</button>
+              <button class="btn primary" data-action="umrah" style="width: 75px";>Open</button>
+              
             </div>
             <div class="soon">v1.0</div>
           </article>
@@ -395,7 +520,7 @@ if (localStorage.getItem('isLoggedIn') !== 'true') {
         <div style="margin-top:18px">
           <div class="card" style="display:flex;gap:12px;align-items:center;">
             <div style="flex:1">
-              <div style="font-weight:700">Tip</div>
+              <div style="font-weight:700; color:var(--text-primary);">Tip</div>
               <div style="color:var(--text-muted);margin-top:6px">Click "Open" to navigate to each tool. These are placeholders: integrate your modules into <code>data-action</code> handlers.</div>
             </div>
             <div><button class="btn primary" onclick="openBuilder()">Open Builder</button></div>
@@ -514,17 +639,7 @@ if (localStorage.getItem('isLoggedIn') !== 'true') {
     });
   });
 
-  // ---------- Copy ID ----------
-  function copyHint(el, id){
-    navigator.clipboard?.writeText(id).then(()=> {
-      const prev = el.innerText;
-      el.innerText = 'Copied';
-      setTimeout(()=> el.innerText = prev, 900);
-    }).catch(()=> {
-      el.innerText = 'Failed';
-      setTimeout(()=> el.innerText = 'Copy ID', 900);
-    });
-  }
+
 
   // ---------- Add recent items ----------
   function addRecent(text){
@@ -552,4 +667,3 @@ if (localStorage.getItem('isLoggedIn') !== 'true') {
 
 </body>
 </html>
-
