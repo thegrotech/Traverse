@@ -1,0 +1,1116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Trip Again Pvt Ltd — Quotations</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    .client-fields {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .client-fields > div {
+      flex: 1 1 180px;
+      min-width: 0;
+    }
+    .client-fields input[type="text"] {
+      width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+    }
+    .logo-shadow {
+      position: relative;
+      width: 64px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo-shadow img {
+      width: 64px;
+      height: 64px;
+      display: block;
+      z-index: 2;
+      background: transparent !important;
+      border-radius: 12px;
+      box-shadow: none;
+    }
+    .plane-shadow {
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      bottom: 6px;
+      height: 18px;
+      border-radius: 50%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 100%);
+      z-index: 1;
+      filter: blur(2px);
+      pointer-events: none;
+    }
+    :root{
+      --brand-red: #d62828;
+      --brand-black: #000;
+      --brand-white: #fff;
+      --brand-gray: #f3f3f3;
+      --accent: #222;
+    }
+    body{
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      background: #efefef;
+      margin: 20px;
+      color: #222;
+    }
+    .app {
+      max-width: 950px;
+      margin: 20px auto;
+    }
+    .card {
+      background: var(--brand-white);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    }
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px;
+      align-items: center;
+      background: var(--brand-black);
+      color: var(--brand-white);
+    }
+    .toolbar .left, .toolbar .right { display:flex; gap:10px; align-items:center; }
+    .btn {
+      display: inline-block;
+      padding: 10px 14px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+    .btn.primary { background: var(--brand-red); color: #fff; border: 1px solid rgba(0,0,0,0.08); }
+    .btn.ghost { background: #fff; color: var(--brand-red); border: 1px solid var(--brand-red); }
+    .btn.ghost:hover { background: var(--brand-red); color: #fff; }
+    .btn.danger { background: #fff; color: #dc2626; border: 1px solid #dc2626; }
+    .btn.icon { padding: 8px 10px; }
+    .select, input[type="text"], input[type="number"], input[type="datetime-local"], input[type="date"], select {
+      padding:8px 10px; border-radius:6px; border:1px solid #ddd; font-size:13px; width:100%;
+    }
+    .quotation {
+      padding: 24px;
+      background: #fff;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 6px solid var(--brand-red);
+      padding: 32px 32px 20px 32px;
+      background: var(--brand-black);
+      color: #fff;
+      border-top-left-radius: 18px;
+      border-top-right-radius: 18px;
+      min-height: 90px;
+    }
+    .brand {
+      display:flex; gap:12px; align-items:center;
+    }
+    .brand img {
+      width:64px; height:64px; object-fit:contain; border-radius:12px; background:#fff;
+    }
+    .brand .title h1 {
+      margin:0;
+      font-size:28px;
+      letter-spacing:0.3px;
+      color: #fff;
+      white-space: nowrap;
+    }
+    .brand .title small {
+      display:block; font-size:13px; color:#fff; opacity:0.95; margin-top:3px;
+    }
+    .quotation-meta {
+      text-align:right;
+      font-size:13px;
+      color: #fff;
+    }
+    .quotation-meta .label { color:#fff; font-weight:600; }
+    .quotation-meta .value { display:block; margin-top:4px; font-weight:700; font-size:15px; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 18px;
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+    .panel {
+      background: #fff;
+      border-radius: 8px;
+      padding: 12px;
+      border: 1px solid #eee;
+      font-size: 13px;
+    }
+    .panel h3 { margin:0 0 8px 0; color:var(--brand-red); font-size:14px; }
+    .inline-row { display:flex; gap:8px; align-items:center; }
+    .small { font-size:12px; color:#666; }
+    .items-table {
+      width:100%;
+      border-collapse: collapse;
+      margin-top: 18px;
+      font-size:13px;
+    }
+    .items-table thead th {
+      background: var(--brand-black);
+      color:#fff;
+      padding:10px;
+      text-align:left;
+      font-weight:700;
+      border: 1px solid rgba(255,255,255,0.02);
+    }
+    .items-table tbody td {
+      padding:10px;
+      border-bottom:1px solid #eee;
+      vertical-align: top;
+    }
+    .muted { color:#666; font-size:12px; }
+    .right { text-align:right; }
+    .center { text-align:center; }
+    .summary {
+      margin-top:18px;
+      padding-right:12px;
+      display:flex;
+      justify-content:flex-end;
+      gap:8px;
+    }
+    .summary .box {
+      min-width:280px;
+      background: #fafafa;
+      border: 1px solid #f0f0f0;
+      padding:12px;
+      padding-right:24px;
+      border-radius:8px;
+      font-size:13px;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      padding-right: 12px;
+    }
+    .summary-row.total { font-weight:800; font-size:16px; color:var(--brand-black); }
+    .footer {
+      margin-top: 24px !important;
+      margin-bottom: 10px !important;
+      padding: 15px 20px 0 20px !important;
+      border-top: 1px dashed #eee !important;
+      font-size: 11px !important;
+      color: #666 !important;
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: flex-start !important;
+      flex-wrap: nowrap !important;
+      gap: 20px !important;
+    }
+
+    .footer .left {
+      flex: 1 !important;
+      max-width: 60% !important;
+      min-width: 0 !important;
+    }
+
+    .footer .right {
+      flex-shrink: 0 !important;
+      min-width: 180px !important;
+      max-width: 55% !important;
+      text-align: right !important;
+    }
+    .add-panel {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 12px;
+      border-top: 1px solid #fafafa;
+      background: #fff;
+      border-radius: 0 0 8px 8px;
+      flex-wrap: wrap;
+    }
+    #categoryFields {
+      flex: 3;
+      display: flex;
+      gap: 30px;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+    .field.small {
+      flex: 1 1 120px;
+      min-width: 120px;
+      max-width: 140px;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1 1 180px;
+      min-width: 140px;
+    }
+    .items-actions { display:flex; gap:8px; align-items:center; }
+    #terms {
+      margin:24px 0 0 0; font-size:12px; color:#444; background:#f3f3f3; border-radius:8px; padding:14px; border:1px solid #eee;
+    }
+    #terms strong { color: var(--brand-red);}
+    .validity-badge {
+      background: #d62828;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 13px;
+      display: inline-block;
+      margin-top: 8px;
+    }
+
+    /* Mobile Responsive Styles */
+    @media (max-width: 900px) {
+      .add-panel, #categoryFields {
+        flex-direction: column !important;
+        gap: 8px !important;
+      }
+      .field, .field.small {
+        min-width: 100% !important;
+        max-width: 100% !important;
+        flex: 1 1 100% !important;
+      }
+    }
+
+    @media (max-width: 800px) {
+      .grid {
+        grid-template-columns: 1fr;
+        padding-left: 8px;
+        padding-right: 8px;
+        gap: 10px;
+      }
+      
+      .brand img { 
+        width: 48px; 
+        height: 48px; 
+      }
+      
+      .brand .title h1 {
+        font-size: 20px !important;
+        white-space: normal !important;
+        line-height: 1.2;
+        word-break: break-word;
+      }
+      
+      .brand .title small {
+        font-size: 11px;
+      }
+      
+      .quotation-meta { 
+        text-align: right; 
+        font-size: 12px;
+      }
+      
+      .quotation-meta .value {
+        font-size: 13px;
+      }
+      
+      .summary .box { 
+        min-width: 90vw; 
+        padding: 10px;
+      }
+      
+      .panel { 
+        padding: 10px; 
+        font-size: 12px;
+      }
+      
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 20px 16px 14px 16px !important;
+        min-height: auto !important;
+      }
+      
+      .brand {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        width: 100%;
+      }
+      
+      .quotation-meta {
+        width: 100%;
+        text-align: left !important;
+      }
+    }
+
+    @media print {
+      html, body {
+        width: 100%;
+        height: 297mm;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+      }
+      
+      .app, .card, .quotation {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+      }
+      
+      .header {
+        border-radius: 8px !important;
+        padding: 12px 18px 8px 18px !important;
+        min-height: 60px !important;
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+      }
+      
+      .header .brand {
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 12px !important;
+        width: auto !important;
+      }
+      
+      .quotation-meta {
+        text-align: right !important;
+        width: auto !important;
+        flex-shrink: 0 !important;
+      }
+      
+      .brand img {
+        width: 48px !important;
+        height: 48px !important;
+      }
+      
+      .brand .title h1 { 
+        font-size: 18px !important;
+        margin: 0 !important;
+        white-space: nowrap !important;
+      }
+      
+      .brand .title small {
+        font-size: 11px !important;
+        margin-top: 2px !important;
+      }
+      
+      .quotation-meta {
+        font-size: 11px !important;
+      }
+      
+      .quotation-meta .value {
+        font-size: 13px !important;
+        margin-top: 2px !important;
+      }
+      
+      .no-print {
+        display: none !important;
+      }
+      
+      .quotation {
+        margin-top: 0 !important;
+      }
+      
+      .summary {
+        justify-content: flex-end !important;
+        padding-right: 12px !important;
+        width: 100% !important;
+      }
+      
+      .summary .box {
+        margin-left: auto !important;
+        margin-right: 0 !important;
+        width: auto !important;
+        min-width: 280px !important;
+      }
+    }
+
+    .app {
+      width: 950px;
+      max-width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="card">
+      <!-- TOP TOOLBAR -->
+      <div class="toolbar no-print">
+        <div class="left">
+          <button class="btn primary" id="btnAddItem">+ Add Service</button>
+          <button class="btn ghost" id="btnClear">Clear All</button>
+          <select id="currencySelect" class="select" style="width:120px;">
+            <option value="PKR">PKR (₨)</option>
+            <option value="USD">USD ($)</option>
+            <option value="SAR">SAR (﷼)</option>
+            <option value="AED">AED (درهم)</option>
+            <option value="EUR">EUR (€)</option>
+          </select>
+          <select id="validityPeriod" class="select" style="width:140px;">
+            <option value="7">Valid 7 Days</option>
+            <option value="15" selected>Valid 15 Days</option>
+            <option value="30">Valid 30 Days</option>
+            <option value="45">Valid 45 Days</option>
+          </select>
+        </div>
+        <div class="right">
+          <button class="btn ghost" id="btnPreview">Preview Quotation</button>
+          <button class="btn" id="btnPrint" style="background:#111;color:#fff;">Print</button>
+          <button class="btn primary" id="btnPdf">Download PDF</button>
+        </div>
+      </div>
+      <!-- PRINTABLE QUOTATION -->
+      <div id="quotationRoot" class="quotation" role="region" aria-label="Quotation printable area">
+        <!-- HEADER -->
+        <div class="header">
+          <div class="brand">
+            <div class="logo-shadow">
+              <img id="brandLogo" src="Trip Again Logo Icon.svg" alt="Trip Again Logo" />
+              <div class="plane-shadow"></div>
+            </div>
+            <div class="title">
+              <h1>Trip Again Pvt Ltd</h1>
+              <small>Your Trusted Travel Partner</small>
+            </div>
+          </div>
+          <div class="quotation-meta">
+            <div class="label">Quotation No.</div>
+            <div class="value" id="quotationNo">QT-2025-0001</div>
+            <div class="label" style="margin-top:8px;">Date Issued</div>
+            <div class="value" id="quotationDateDisplay"></div>
+            <div class="validity-badge" id="validityBadge">Valid until: </div>
+          </div>
+        </div>
+        <!-- MAIN GRID -->
+        <div class="grid">
+          <!-- Left Column: Travel Summary -->
+          <div>
+            <div class="panel">
+              <h3>Travel Summary</h3>
+              <div id="travelSummary" class="small muted">
+                No travel services added yet.
+              </div>
+            </div>
+            <div class="panel" style="margin-top:12px;">
+              <h3>Passenger Details</h3>
+              <div id="passengerSummary" class="small muted">No passengers added.</div>
+            </div>
+          </div>
+          <!-- Right Column: Client & Company -->
+          <div>
+            <div class="panel">
+              <h3>Client Details</h3>
+              <div class="client-fields">
+                <div>
+                  <div class="muted">Client / Company Name</div>
+                  <div><input id="clientName" type="text" placeholder="Full name or company" /></div>
+                </div>
+                <div>
+                  <div class="muted">Contact Information</div>
+                  <div><input id="clientContact" type="text" placeholder="Phone / Email" /></div>
+                </div>
+              </div>
+              <div class="client-fields" style="margin-top:10px;">
+                <div style="flex:1;">
+                  <div class="muted">Travel Requirements</div>
+                  <div><input id="travelRequirements" type="text" placeholder="Specific travel needs or preferences" /></div>
+                </div>
+              </div>
+            </div>
+            <div class="panel" style="margin-top:12px;">
+              <h3>Prepared By</h3>
+              <div class="muted">Travel Consultant</div>
+              <div style="margin-top:6px;">Trip Again Pvt Ltd — Travel Solutions & Services</div>
+              <div style="margin-top:10px; font-size:13px;">
+                <div class="muted">Registered Office</div>
+                <div>Office #2, Ground Floor, Plot 263-C, PECHS Block 2, Karachi, Pakistan</div>
+                <div class="muted" style="margin-top:6px;">DTS & IATA Registered | NTN: 123456789</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- SERVICES TABLE -->
+        <table class="items-table" aria-describedby="services-description">
+          <thead>
+            <tr>
+              <th style="width:16%">Service Type</th>
+              <th>Service Description</th>
+              <th style="width:10%" class="center">Qty</th>
+              <th style="width:16%" class="right">Unit Price</th>
+              <th style="width:16%" class="right">Total</th>
+              <th style="width:8%" class="center no-print">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="servicesBody">
+            <!-- JS will insert rows -->
+          </tbody>
+        </table>
+        <!-- SUMMARY -->
+        <div class="summary">
+          <div class="box">
+            <div class="summary-row"><div>Sub Total</div><div id="subTotal" class="right">PKR 0</div></div>
+            <div class="summary-row">
+              <div>Service Discount</div>
+              <div><input id="discountInput" type="number" min="0" value="0" style="width:90px;" /></div>
+            </div>
+            <div class="summary-row">
+              <div>Service Tax (%)</div>
+              <div><input id="taxInput" type="number" min="0" value="0" step="0.01" style="width:90px;" /></div>
+            </div>
+            <div class="summary-row total"><div>Total Amount</div><div id="totalAmount" class="right">PKR 0</div></div>
+            <hr style="margin:10px 0;">
+            <div class="summary-row">
+              <div>Advance Required</div>
+              <div><input id="advanceRequired" type="number" min="0" value="0" style="width:90px;" /></div>
+            </div>
+            <div class="summary-row">
+              <div><strong>Balance Payable</strong></div>
+              <div id="balancePayable" class="right">PKR 0</div>
+            </div>
+            <div class="summary-row">
+              <div>Quotation Valid Until</div>
+              <div id="validUntilDate" class="right"></div>
+            </div>
+          </div>
+        </div>
+        <!-- FOOTER -->
+        <div class="footer">
+          <div class="left" style="margin-top:15px; line-height:1.8;">
+            <strong style="color:#d62828;">Trip Again Pvt Ltd</strong> — <span style="color:#111;">Your Trusted Travel Partner</span> <br>
+            Office #2, Ground Floor, Plot 263-C, PECHS Block 2, Karachi, Pakistan <br>
+            📧 quotes@tripagainp.pk | ☎ +92 333 3473348 | 🌐 <a href="https://www.tripagain.pk" target="_blank">www.tripagain.pk</a>
+          </div>
+          <div class="right muted">
+            <div>Facebook: Trip Again Travel & Tours</div>
+            <div>WhatsApp: +92 333 3473348</div>
+            <div style="margin-top:8px; font-size:11px;">Professional Travel Consultants | IATA Certified</div>
+            <div style="margin-top:4px; font-size:11px;">Quotation Engine by <strong>GroTech Solutions</strong></div>
+          </div>
+        </div>
+        <!-- TERMS & CONDITIONS -->
+        <div id="terms">
+          <strong>Quotation Terms & Conditions:</strong>
+          <ul style="margin:8px 0 0 18px; padding:0;">
+            <li>This quotation is valid for <strong id="validityText">15 days</strong> from the date of issue unless otherwise specified.</li>
+            <li>Prices are subject to change without prior notice due to airline, hotel, or government tariff revisions.</li>
+            <li>Booking confirmation requires <strong>50% advance payment</strong> for all services.</li>
+            <li>Cancellation charges apply as per service provider policies. Our service fee is non-refundable.</li>
+            <li>Visa approval is at the sole discretion of the concerned embassy/consulate.</li>
+            <li>All payments must be made to Trip Again Pvt Ltd official bank accounts only.</li>
+            <li>Travel insurance is highly recommended and can be arranged upon request.</li>
+            <li>Force majeure events may affect service delivery without liability to Trip Again Pvt Ltd.</li>
+            <li>For complete terms, visit <a href="https://www.tripagainp.pk/terms" target="_blank">tripagainp.pk/terms</a>.</li>
+          </ul>
+        </div>
+      </div>
+      <!-- ADD SERVICE PANEL -->
+      <div class="add-panel no-print" id="addPanel" style="display:none;">
+        <div style="flex:1; min-width:140px;">
+          <div class="muted">Service Type</div>
+          <select id="serviceCategory" class="select">
+            <option value="flight">Flight Booking</option>
+            <option value="visa">Visa Processing</option>
+            <option value="hotel">Hotel Reservation</option>
+            <option value="tour">Tour Package</option>
+            <option value="transfer">Airport Transfer</option>
+            <option value="insurance">Travel Insurance</option>
+            <option value="other">Other Service</option>
+          </select>
+        </div>
+        <!-- Dynamic fields container -->
+        <div id="categoryFields">
+          <!-- JS injects inputs for the selected category -->
+        </div>
+        <div style="display:flex; flex-direction:column; justify-content:flex-end; align-items:stretch; gap:08px; margin-left:16px; min-width:120px; margin-top: 30px; margin-right: 20px;">
+          <button class="btn ghost" id="btnCancelAdd">Cancel</button>
+          <button class="btn primary" id="btnConfirmAdd">Add to Quotation</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    // --- Currency logic ---
+    const currencySelect = document.getElementById('currencySelect');
+    let currentCurrency = 'PKR';
+    const currencySymbols = { PKR: '₨', USD: '$', SAR: '﷼', AED: 'درهم', EUR: '€' };
+    
+    // --- Quotation logic ---
+    const services = [];
+    const servicesBody = document.getElementById('servicesBody');
+    const subTotalEl = document.getElementById('subTotal');
+    const totalAmountEl = document.getElementById('totalAmount');
+    const discountInput = document.getElementById('discountInput');
+    const taxInput = document.getElementById('taxInput');
+    const travelSummary = document.getElementById('travelSummary');
+    const passengerSummary = document.getElementById('passengerSummary');
+    const quotationNoEl = document.getElementById('quotationNo');
+    const quotationDateDisplay = document.getElementById('quotationDateDisplay');
+    const validityBadge = document.getElementById('validityBadge');
+    const validityText = document.getElementById('validityText');
+    const validUntilDate = document.getElementById('validUntilDate');
+    const clientNameInput = document.getElementById('clientName');
+    const clientContactInput = document.getElementById('clientContact');
+    const travelRequirementsInput = document.getElementById('travelRequirements');
+    const addPanel = document.getElementById('addPanel');
+    const btnAddItem = document.getElementById('btnAddItem');
+    const btnCancelAdd = document.getElementById('btnCancelAdd');
+    const btnConfirmAdd = document.getElementById('btnConfirmAdd');
+    const serviceCategory = document.getElementById('serviceCategory');
+    const categoryFields = document.getElementById('categoryFields');
+    const btnClear = document.getElementById('btnClear');
+    const btnPrint = document.getElementById('btnPrint');
+    const btnPdf = document.getElementById('btnPdf');
+    const btnPreview = document.getElementById('btnPreview');
+    const advanceRequiredInput = document.getElementById('advanceRequired');
+    const balancePayableEl = document.getElementById('balancePayable');
+    const validityPeriod = document.getElementById('validityPeriod');
+
+    // --- INIT ---
+    function init() {
+      // quotation number from localStorage
+      let counter = parseInt(localStorage.getItem('quotationCounter')||'1',10);
+      const year = new Date().getFullYear();
+      quotationNoEl.textContent = `QT-${year}-${String(counter).padStart(4,'0')}`;
+      
+      // Set dates
+      const today = new Date();
+      quotationDateDisplay.textContent = today.toLocaleDateString();
+      updateValidityDate();
+      
+      localStorage.setItem('quotationCounter', String(counter + 1));
+      
+      // Event listeners
+      btnAddItem.addEventListener('click', showAddPanel);
+      serviceCategory.addEventListener('change', () => renderCategoryFields(serviceCategory.value));
+      btnCancelAdd.addEventListener('click', hideAddPanel);
+      btnConfirmAdd.addEventListener('click', addServiceFromPanel);
+      btnClear.addEventListener('click', clearAll);
+      btnPrint.addEventListener('click', () => window.print());
+      btnPdf.addEventListener('click', downloadPdf);
+      btnPreview.addEventListener('click', () => quotationRoot.scrollIntoView({behavior:'smooth'}));
+      currencySelect.addEventListener('change', () => {
+        currentCurrency = currencySelect.value;
+        renderServices();
+        renderSummary();
+      });
+      validityPeriod.addEventListener('change', updateValidityDate);
+      advanceRequiredInput.addEventListener('input', renderSummary);
+      discountInput.addEventListener('input', renderSummary);
+      taxInput.addEventListener('input', renderSummary);
+      
+      renderCategoryFields(serviceCategory.value);
+      renderServices();
+    }
+
+    function updateValidityDate() {
+      const days = parseInt(validityPeriod.value);
+      const today = new Date();
+      const validUntil = new Date(today);
+      validUntil.setDate(today.getDate() + days);
+      
+      validityBadge.textContent = `Valid until: ${validUntil.toLocaleDateString()}`;
+      validUntilDate.textContent = validUntil.toLocaleDateString();
+      validityText.textContent = `${days} days`;
+    }
+
+    // --- Add Service Modal ---
+    function showAddPanel(){
+        addPanel.style.display = 'flex';
+        window.scrollTo({top: document.body.scrollHeight, behavior:'smooth'});
+    }
+
+    function hideAddPanel(){
+      addPanel.style.display = 'none';
+      clearCategoryInputs();
+    }
+
+    function clearCategoryInputs(){
+      categoryFields.innerHTML = '';
+    }
+
+    function renderCategoryFields(cat){
+      categoryFields.innerHTML = '';
+      if(cat === 'flight'){
+        categoryFields.innerHTML = `
+          <div class="field small">
+            <label class="muted">Passenger Name</label>
+            <input id="f_passenger" type="text" placeholder="Full name" />
+          </div>
+          <div class="field small">
+            <label class="muted">Flight Number</label>
+            <input id="f_flight" type="text" placeholder="e.g. PK-123" />
+          </div>
+          <div class="field small">
+            <label class="muted">Departure Date</label>
+            <input id="f_dep" type="datetime-local" />
+          </div>
+          <div class="field small">
+            <label class="muted">Route</label>
+            <input id="f_route" type="text" placeholder="From - To" />
+          </div>
+          <div class="field small">
+            <label class="muted">Passengers</label>
+            <input id="f_qty" type="number" min="1" value="1" />
+          </div>
+          <div class="field small">
+            <label class="muted">Price per Ticket</label>
+            <input id="f_price" type="number" min="0" value="0" />
+          </div>
+        `;
+      } else if(cat === 'visa'){
+        categoryFields.innerHTML = `
+          <div class="field">
+            <label class="muted">Destination Country</label>
+            <select id="v_country">
+              <option>Saudi Arabia</option>
+              <option>United Arab Emirates</option>
+              <option>Malaysia</option>
+              <option>Thailand</option>
+              <option>Turkey</option>
+              <option>United Kingdom</option>
+              <option>United States</option>
+              <option>Canada</option>
+              <option>Australia</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="muted">Visa Category</label>
+            <select id="v_type">
+              <option>Tourist Visa</option>
+              <option>Umrah Visa</option>
+              <option>Business Visa</option>
+              <option>Family Visit Visa</option>
+              <option>Transit Visa</option>
+              <option>Work Visa</option>
+              <option>Student Visa</option>
+            </select>
+          </div>
+          <div class="field small">
+            <label class="muted">Number of Applicants</label>
+            <input id="v_qty" type="number" min="1" value="1" />
+          </div>
+          <div class="field small">
+            <label class="muted">Fee per Applicant</label>
+            <input id="v_price" type="number" min="0" value="0" />
+          </div>
+        `;
+      } else if(cat === 'hotel'){
+        categoryFields.innerHTML = `
+          <div class="field">
+            <label class="muted">Hotel & City</label>
+            <input id="h_name" type="text" placeholder="Hotel name - City" />
+          </div>
+          <div class="field small">
+            <label class="muted">Check-in Date</label>
+            <input id="h_checkin" type="date" />
+          </div>
+          <div class="field small">
+            <label class="muted">Check-out Date</label>
+            <input id="h_checkout" type="date" />
+          </div>
+          <div class="field small">
+            <label class="muted">Rooms</label>
+            <input id="h_rooms" type="number" min="1" value="1" />
+          </div>                    
+          <div class="field small">
+            <label class="muted">Nights</label>
+            <input id="h_nights" type="number" min="1" value="1" readonly style="background-color:#f5f5f5; cursor:not-allowed;" />
+          </div>
+          <div class="field small">
+            <label class="muted">Rate per Night</label>
+            <input id="h_price" type="number" min="0" value="0" />
+          </div>
+        `;
+        document.getElementById('h_checkin').addEventListener('change', calculateNights);
+        document.getElementById('h_checkout').addEventListener('change', calculateNights);
+      } else if(cat === 'tour'){
+        categoryFields.innerHTML = `
+          <div class="field">
+            <label class="muted">Tour Package</label>
+            <input id="t_name" type="text" placeholder="Package name" />
+          </div>
+          <div class="field">
+            <label class="muted">Duration</label>
+            <input id="t_duration" type="text" placeholder="e.g., 5 Days / 4 Nights" />
+          </div>
+          <div class="field small">
+            <label class="muted">Travelers</label>
+            <input id="t_qty" type="number" min="1" value="1" />
+          </div>
+          <div class="field small">
+            <label class="muted">Price per Person</label>
+            <input id="t_price" type="number" min="0" value="0" />
+          </div>
+        `;
+      } else if(cat === 'transfer'){
+        categoryFields.innerHTML = `
+          <div class="field">
+            <label class="muted">Transfer Service</label>
+            <input id="tr_type" type="text" placeholder="Airport-Hotel, City Transfer, etc." />
+          </div>
+          <div class="field">
+            <label class="muted">Vehicle Type</label>
+            <select id="tr_vehicle">
+              <option>Sedan Car</option>
+              <option>SUV</option>
+              <option>Van</option>
+              <option>Luxury Car</option>
+              <option>Bus</option>
+            </select>
+          </div>
+          <div class="field small">
+            <label class="muted">Trips</label>
+            <input id="tr_qty" type="number" min="1" value="1" />
+          </div>
+          <div class="field small">
+            <label class="muted">Price per Trip</label>
+            <input id="tr_price" type="number" min="0" value="0" />
+          </div>
+        `;
+      } else if(cat === 'insurance'){
+        categoryFields.innerHTML = `
+          <div class="field">
+            <label class="muted">Insurance Plan</label>
+            <input id="i_plan" type="text" placeholder="Travel Insurance Plan" />
+          </div>
+          <div class="field">
+            <label class="muted">Coverage Duration</label>
+            <input id="i_duration" type="text" placeholder="e.g., 15 days" />
+          </div>
+          <div class="field small">
+            <label class="muted">Persons</label>
+            <input id="i_qty" type="number" min="1" value="1" />
+          </div>
+          <div class="field small">
+            <label class="muted">Premium per Person</label>
+            <input id="i_price" type="number" min="0" value="0" />
+          </div>
+        `;
+      } else {
+        categoryFields.innerHTML = `
+          <div class="field">
+            <label class="muted">Service Description</label>
+            <input id="o_desc" type="text" placeholder="Service details" />
+          </div>
+          <div class="field small">
+            <label class="muted">Quantity</label>
+            <input id="o_qty" type="number" min="1" value="1" />
+          </div>
+          <div class="field small">
+            <label class="muted">Unit Price</label>
+            <input id="o_price" type="number" min="0" value="0" />
+          </div>
+        `;
+      }
+    }
+
+    function addServiceFromPanel(){
+        const cat = serviceCategory.value;
+        
+        // Validation
+        if ((cat === 'flight' && !document.getElementById('f_passenger').value) ||
+            (cat === 'visa' && (!document.getElementById('v_country').value || !document.getElementById('v_type').value)) ||
+            (cat === 'hotel' && (!document.getElementById('h_checkin').value || !document.getElementById('h_checkout').value || !document.getElementById('h_name').value)) ||
+            (cat === 'tour' && !document.getElementById('t_name').value) ||
+            (cat === 'transfer' && !document.getElementById('tr_type').value) ||
+            (cat === 'insurance' && !document.getElementById('i_plan').value) ||
+            (cat === 'other' && !document.getElementById('o_desc').value)) {
+            alert('Please fill all required fields');
+            return;
+        }
+
+        let service = { category: cat, desc: '', qty: 1, unit: 0, total: 0 };
+        
+        if(cat === 'flight'){
+            service.desc = `${document.getElementById('f_passenger').value} | ${document.getElementById('f_flight').value} | ${document.getElementById('f_route').value} | ${formatDate(document.getElementById('f_dep').value)}`;
+            service.qty = parseInt(document.getElementById('f_qty').value)||1;
+            service.unit = parseFloat(document.getElementById('f_price').value)||0;
+        } else if(cat === 'visa'){
+            service.desc = `${document.getElementById('v_country').value} | ${document.getElementById('v_type').value}`;
+            service.qty = parseInt(document.getElementById('v_qty').value)||1;
+            service.unit = parseFloat(document.getElementById('v_price').value)||0;
+        } else if(cat === 'hotel'){
+            const checkin = new Date(document.getElementById('h_checkin').value);
+            const checkout = new Date(document.getElementById('h_checkout').value);
+            const nights = Math.ceil((checkout - checkin) / (1000 * 60 * 60 * 24));
+            const rooms = parseInt(document.getElementById('h_rooms').value) || 1;
+            const rate = parseFloat(document.getElementById('h_price').value) || 0;
+            
+            service.desc = `${document.getElementById('h_name').value} | Check-in: ${document.getElementById('h_checkin').value} | ${nights} Nights | ${rooms} Room(s)`;
+            service.qty = nights;
+            service.unit = rate * rooms;
+        } else if(cat === 'tour'){
+            service.desc = `${document.getElementById('t_name').value} | ${document.getElementById('t_duration').value}`;
+            service.qty = parseInt(document.getElementById('t_qty').value)||1;
+            service.unit = parseFloat(document.getElementById('t_price').value)||0;
+        } else if(cat === 'transfer'){
+            service.desc = `${document.getElementById('tr_type').value} | ${document.getElementById('tr_vehicle').value}`;
+            service.qty = parseInt(document.getElementById('tr_qty').value)||1;
+            service.unit = parseFloat(document.getElementById('tr_price').value)||0;
+        } else if(cat === 'insurance'){
+            service.desc = `${document.getElementById('i_plan').value} | ${document.getElementById('i_duration').value}`;
+            service.qty = parseInt(document.getElementById('i_qty').value)||1;
+            service.unit = parseFloat(document.getElementById('i_price').value)||0;
+        } else {
+            service.desc = document.getElementById('o_desc').value;
+            service.qty = parseInt(document.getElementById('o_qty').value)||1;
+            service.unit = parseFloat(document.getElementById('o_price').value)||0;
+        }
+        
+        if (service.unit <= 0) {
+            alert('Please enter a valid price greater than 0');
+            return;
+        }
+        
+        service.total = service.qty * service.unit;
+        services.push(service);
+        hideAddPanel();
+        renderServices();
+        renderSummary();
+    }
+
+    function calculateNights() {
+        const checkin = document.getElementById('h_checkin');
+        const checkout = document.getElementById('h_checkout');
+        const nightsField = document.getElementById('h_nights');
+        
+        if (checkin.value && checkout.value) {
+            const start = new Date(checkin.value);
+            const end = new Date(checkout.value);
+            
+            if (end <= start) {
+                nightsField.value = 1;
+                alert('Check-out date must be after check-in date');
+                return;
+            }
+            
+            const nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+            nightsField.value = nights > 0 ? nights : 1;
+        }
+    }
+
+    function formatDate(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString();
+    }
+
+    function renderServices(){
+        servicesBody.innerHTML = '';
+        if(services.length === 0){
+            servicesBody.innerHTML = `<tr><td colspan="6" class="center muted">No services added yet.</td></tr>`;
+        } else {
+            services.forEach((service, idx) => {
+                servicesBody.innerHTML += `
+                <tr>
+                    <td>${capitalize(service.category)}</td>
+                    <td>${service.desc}</td>
+                    <td class="center">${service.qty}</td>
+                    <td class="right">${formatCurrency(service.unit)}</td>
+                    <td class="right">${formatCurrency(service.total)}</td>
+                    <td class="center no-print">
+                    <button class="btn danger btnDel" data-idx="${idx}" title="Remove">&#10006;</button>
+                    </td>
+                </tr>
+                `;
+            });
+        }
+        document.querySelectorAll('.btnDel').forEach(btn => {
+            btn.onclick = function(){ services.splice(this.dataset.idx,1); renderServices(); renderSummary(); };
+        });
+        renderSummary();
+        renderTravelPassengerSummary();
+    }
+
+    function renderTravelPassengerSummary(){
+        const flights = services.filter(s => s.category === 'flight');
+        const travelPanel = document.querySelector('#travelSummary').closest('.panel').parentElement;
+        
+        if (flights.length) {
+            travelPanel.style.display = 'block';
+            travelSummary.innerHTML = flights.map(f => `<div>${f.desc}</div>`).join('');
+            
+            const passengerPanel = document.querySelector('#passengerSummary').closest('.panel').parentElement;
+            passengerPanel.style.display = 'block';
+            passengerSummary.innerHTML = flights.map(f => `<div>${f.desc.split('|')[0].trim()}</div>`).join('');
+        } else {
+            travelPanel.style.display = 'none';
+            const passengerPanel = document.querySelector('#passengerSummary').closest('.panel').parentElement;
+            passengerPanel.style.display = 'none';
+        }
+    }
+
+    function formatCurrency(amount){
+        let symbol = currencySymbols[currentCurrency] || '';
+        let formatted = amount.toLocaleString(undefined, {minimumFractionDigits:2});
+        return `${symbol} ${formatted}`;
+    }
+
+    function renderSummary(){
+      let subTotal = services.reduce((sum, service) => sum + service.total, 0);
+      
+      let discountAmount = parseFloat(discountInput.value) || 0;
+      let taxRate = parseFloat(taxInput.value) || 0;
+      
+      let taxableAmount = Math.max(subTotal - discountAmount, 0);
+      let taxAmount = (taxableAmount * taxRate) / 100;
+      
+      let totalAmount = taxableAmount + taxAmount;
+      let advance = parseFloat(advanceRequiredInput.value) || 0;
+      let balance = Math.max(totalAmount - advance, 0);
+      
+      subTotalEl.textContent = formatCurrency(subTotal);
+      totalAmountEl.textContent = formatCurrency(totalAmount);
+      balancePayableEl.textContent = formatCurrency(balance);
+    }
+
+    function clearAll(){
+      if(confirm('Clear all quotation data?')){
+        services.length = 0;
+        discountInput.value = '0';
+        taxInput.value = '0';
+        advanceRequiredInput.value = '0';
+        clientNameInput.value = '';
+        clientContactInput.value = '';
+        travelRequirementsInput.value = '';
+        renderServices();
+        renderSummary();
+      }
+    }
+
+    function capitalize(str){ return str.charAt(0).toUpperCase() + str.slice(1);}
+
+    function downloadPdf(){
+      let opt = {
+        margin:       0.2,
+        filename:     'TripAgain-Quotation.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, ignoreElements: (el) => el.classList && el.classList.contains('no-print') },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().from(document.getElementById('quotationRoot')).set(opt).save();
+    }
+
+    // --- INIT ---
+    window.onload = init;
+  </script>
+</body>
+</html>
