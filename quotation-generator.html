@@ -353,6 +353,275 @@
       }
     }
 
+    @media (max-width: 768px) {
+  /* Enhanced table responsiveness */
+  .items-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    font-size: 12px;
+  }
+  
+  .items-table thead {
+    display: table-header-group;
+  }
+  
+  .items-table tbody {
+    display: table-row-group;
+  }
+  
+  .items-table th,
+  .items-table td {
+    min-width: 80px;
+    padding: 8px 6px;
+  }
+  
+  /* Stack summary inputs properly */
+  .summary .box {
+    min-width: 0;
+    width: 100%;
+    padding: 12px;
+  }
+  
+  .summary-row {
+    flex-direction: column;
+    gap: 4px;
+    align-items: stretch;
+  }
+  
+  .summary-row .right {
+    text-align: left;
+  }
+  
+  .summary .box input[type="number"],
+  .summary .box input[type="date"],
+  .summary .box select {
+    width: 100% !important;
+    max-width: none !important;
+  }
+}
+
+@media (max-width: 600px) {
+  body {
+    margin: 10px !important;
+    font-size: 14px;
+  }
+  
+  .app {
+    margin: 10px auto;
+  }
+  
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 8px;
+  }
+  
+  .toolbar .left, .toolbar .right {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+  
+  .btn, .select {
+    width: 100%;
+    min-width: 0;
+    font-size: 14px;
+    padding: 12px 10px;
+    min-height: 44px; /* Better touch targets */
+  }
+  
+  /* Enhanced client fields for mobile */
+  .client-fields {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .client-fields > div {
+    min-width: 100%;
+    flex: 1 1 100%;
+  }
+  
+  /* Footer mobile optimization */
+  .footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 8px 0 8px;
+    font-size: 11px;
+  }
+  
+  .footer .left, .footer .right {
+    max-width: 100%;
+    min-width: 0;
+    padding-right: 0;
+    width: 100%;
+    justify-content: flex-start !important;
+  }
+  
+  .footer .right {
+    text-align: left !important;
+  }
+  
+  /* Terms mobile optimization */
+  #terms {
+    margin: 20px 0 0 0;
+    padding: 12px;
+    font-size: 11px;
+  }
+  
+  #terms ul {
+    margin: 6px 0 0 12px;
+    padding: 0;
+  }
+  
+  /* Add panel mobile optimization */
+  .add-panel {
+    padding: 10px;
+    gap: 8px;
+    flex-direction: column;
+  }
+  
+  #categoryFields {
+    gap: 8px;
+    width: 100%;
+  }
+  
+  .field, .field.small {
+    min-width: 100% !important;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Extra small screen optimizations */
+  .brand .title h1 {
+    font-size: 18px !important;
+  }
+  
+  .quotation-meta {
+    font-size: 11px;
+  }
+  
+  .header {
+    padding: 16px 12px 12px 12px !important;
+  }
+  
+  /* Enhanced table for very small screens */
+  .items-table {
+    font-size: 11px;
+  }
+  
+  .items-table thead th:nth-child(1) { min-width: 70px; } /* Category */
+  .items-table thead th:nth-child(2) { min-width: 120px; } /* Description */
+  .items-table thead th:nth-child(3) { min-width: 40px; } /* Qty */
+  .items-table thead th:nth-child(4) { min-width: 80px; } /* Unit Price */
+  .items-table thead th:nth-child(5) { min-width: 80px; } /* Total */
+  
+  /* Summary box mobile optimization */
+  .summary .box {
+    padding: 10px;
+  }
+  
+  .summary-row {
+    margin-bottom: 6px;
+  }
+  
+  /* Form inputs mobile optimization */
+  input[type="text"], 
+  input[type="number"], 
+  input[type="datetime-local"], 
+  input[type="date"], 
+  select {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+    padding: 12px 8px;
+    min-height: 44px; /* Better touch targets */
+  }
+    /* Footer mobile optimization */
+  .footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 8px 0 8px;
+    font-size: 11px;
+  }
+  
+  .footer .left, .footer .right {
+    max-width: 100%;
+    min-width: 0;
+    padding-right: 0;
+    width: 100%;
+    justify-content: flex-start !important;
+  }
+  
+  .footer .right {
+    text-align: left !important;
+  }
+}
+
+@media (max-width: 360px) {
+  /* Ultra-small screen optimizations */
+  .brand img {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .brand .title h1 {
+    font-size: 16px !important;
+  }
+  
+  .items-table {
+    font-size: 10px;
+  }
+  
+  .items-table th,
+  .items-table td {
+    padding: 6px 4px;
+  }
+}
+
+/* Improve touch targets for mobile */
+@media (hover: none) and (pointer: coarse) {
+  .btn {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .items-table .btnDel {
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 16px;
+  }
+  
+  /* Ensure all interactive elements are touch-friendly */
+  .select, 
+  input[type="text"], 
+  input[type="number"], 
+  input[type="datetime-local"], 
+  input[type="date"], 
+  select {
+    min-height: 44px;
+  }
+}
+
+
+.app {
+  width: 950px;
+  max-width: 100%;
+}
+/* Adjust grid layout when left column is hidden */
+.grid > div:first-child:not([style*="display: none"]) ~ div {
+    grid-column: 1 / -1;
+}
+
+/* Smooth transitions */
+.grid > div {
+    transition: all 0.3s ease;
+}
+
     @media print {
       html, body {
         width: 100%;
@@ -719,16 +988,31 @@
       renderServices();
     }
 
-    function updateValidityDate() {
-      const days = parseInt(validityPeriod.value);
-      const today = new Date();
-      const validUntil = new Date(today);
-      validUntil.setDate(today.getDate() + days);
-      
-      validityBadge.textContent = `Valid until: ${validUntil.toLocaleDateString()}`;
-      validUntilDate.textContent = validUntil.toLocaleDateString();
-      validityText.textContent = `${days} days`;
-    }
+function updateValidityDate() {
+  const days = parseInt(validityPeriod.value);
+  const today = new Date();
+  const validUntil = new Date(today);
+  validUntil.setDate(today.getDate() + days);
+  
+  // Format date as DD-MMM-YYYY (e.g., 31-Dec-2024)
+  const formattedDate = formatDateForDisplay(validUntil);
+  
+  validityBadge.textContent = `Valid until: ${formattedDate}`;
+  validUntilDate.textContent = formattedDate;
+  validityText.textContent = `${days} days`;
+}
+
+// Add this date formatting function
+function formatDateForDisplay(date) {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = months[date.getMonth()];
+  const year = date.getFullYear();
+  
+  return `${day}-${month}-${year}`;
+}
 
     // --- Add Service Modal ---
     function showAddPanel(){
