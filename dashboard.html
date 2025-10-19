@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script>// Redirect to login if user is not logged in
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+      <script>// Redirect to login if user is not logged in
 if (localStorage.getItem('isLoggedIn') !== 'true') {
   window.location.href = 'index.html';
 }
 </script>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Trip Again — Dashboard</title>
 
   <!-- favicon / manifest (optional, add files when ready) -->
+   <link rel="icon" type="image/png" href="logo.png">
   <!-- <link rel="manifest" href="/manifest.json"> -->
 
   <!-- Fonts & icons -->
@@ -35,7 +36,7 @@ if (localStorage.getItem('isLoggedIn') !== 'true') {
   /* Text colors for dark theme */
   --text-primary: #e6eef6;
   --text-secondary: #9aa3ac;
-  --text-muted: #6b7280;
+  --text-muted: #a3acb7;
   --shadow-color: rgb(38, 38, 39);
   --shadow: 0 10px 30px var(--shadow-color);
 }
@@ -76,6 +77,9 @@ if (localStorage.getItem('isLoggedIn') !== 'true') {
       justify-content:center;
       align-items:flex-start;
       padding:28px;
+      .app {
+  transition: background 1s ease, color 0.8s ease;
+}
     }
 
     /* Shell */
@@ -403,6 +407,28 @@ body {
   color: var(--accent-2) !important;
   background: var(--glass);
 }
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--card);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 12px 18px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+.toast.success { border-left: 4px solid #4CAF50; }
+.toast.error { border-left: 4px solid #f44336; }
+.toast.info { border-left: 4px solid #2196F3; }
+
   </style>
 </head>
 <body>
@@ -482,10 +508,26 @@ body {
             <div class="soon">v1.0</div>
           </article>
 
+          <!-- Add this new card before the More Tools card -->
+          <article class="card" id="quotationgeneratorcard" role="article" aria-labelledby="quotationgeneratorTitle">
+            <div class="top">
+              <div class="icon"><i class="fas fa-file-invoice"></i></div>
+              <div>
+                <div class="title" id="quotationgeneratorTitle">Quotation Generator</div>
+                <div class="desc">Create professional quotations in seconds.</div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn primary" data-action="quotation" style="width: 75px;">Open</button>
+            </div>
+            <div class="soon">v1.0</div>
+          </article>
+
           <!-- Umrah Expense -->
           <article class="card" id="umrahCard" role="article" aria-labelledby="umrahTitle">
             <div class="top">
-              <div class="icon"><i class="fas fa-praying-hands"></i></div>
+              <div class="icon"><i class="fas fa-kaaba"></i></div>
               <div>
                 <div class="title" id="umrahTitle">Umrah Expense Calculator</div>
                 <div class="desc">Estimate travel, food, & accommodation costs.</div>
@@ -612,14 +654,14 @@ body {
   });
 })();
 
-
   // ---------- Tool actions ----------
   function triggerAction(name){
     // Route to your actual hosted modules
     const links = {
       invoice: 'create-invoice.html',
       voucher: 'generate-voucher.html',
-      umrah: 'calculate-umrah-expenses.html'
+      umrah: 'calculate-umrah-expenses.html',
+      quotation: 'quotation-generator.html',
     };
 
     if (links[name]) {
@@ -638,8 +680,6 @@ body {
       triggerAction(action);
     });
   });
-
-
 
   // ---------- Add recent items ----------
   function addRecent(text){
@@ -663,6 +703,35 @@ body {
   localStorage.removeItem('isLoggedIn');
   window.location.href = 'index.html';
 }
+function addRecent(text){
+  const recentItems = JSON.parse(localStorage.getItem('recentItems') || '[]');
+  const newItem = { name: text, time: new Date().toLocaleString() };
+  recentItems.unshift(newItem);
+  if (recentItems.length > 6) recentItems.pop();
+  localStorage.setItem('recentItems', JSON.stringify(recentItems));
+  renderRecent();
+}
+function renderRecent(){
+  const recent = document.getElementById('recentList');
+  const items = JSON.parse(localStorage.getItem('recentItems') || '[]');
+  recent.innerHTML = items.length
+    ? items.map(i => `<div class="quick-item"><div>${i.name}</div><div>${i.time}</div></div>`).join('')
+    : '<div class="quick-item">No recent items yet</div>';
+}
+renderRecent();
+function showToast(message, type = 'info') {
+  const toast = document.createElement('div');
+  toast.textContent = message;
+  toast.className = `toast ${type}`;
+  document.body.appendChild(toast);
+
+  setTimeout(() => toast.classList.add('show'), 100);
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  }, 2500);
+}
+
 </script>
 
 </body>
