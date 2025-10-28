@@ -66,7 +66,7 @@
 
       /* Left: form, Right: preview */
       .panel {
-        background: var(--d-bg);
+        background: var(--card-bg);
         border-radius: 10px;
         padding: 14px;
         border:1px solid #eee;
@@ -156,11 +156,17 @@
     display: none;
   }
 }
+
+/* ADD THIS - Hide Action column during PDF export */
+.pdf-export .v-section:nth-child(4) .v-table th:last-child,
+.pdf-export .v-section:nth-child(4) .v-table td:last-child {
+  display: none !important;
+}
     </style>
   </head>
   <body>
     <div class="app">
-      <div class="d">
+      <div class="card">
         <div class="toolbar">
           <div class="left">
             <strong style="font-size:16px">Trip Again Pvt Ltd</strong>
@@ -319,6 +325,8 @@
                   <option value="Option 1">Jeddah Airport → Makkah Hotel → Madinah Hotel → Makkah Hotel → Jeddah Airport</option>
                   <option value="Option 2">Jeddah Airport → Makkah Hotel → Madinah Hotel → Madinah Airport</option>
                   <option value="Option 3">Madinah Airport → Madinah Hotel → Makkah Hotel → Jeddah Airport</option>
+                  <option value="Option 4">Jeddah Airport → Makkah Hotel</option>
+                  <option value="Option 5">Madinah Airport → Madinah Hotel</option>
                   <option value="Custom">Custom</option>
                 </select>
               </div>
@@ -331,13 +339,13 @@
               <div class="field">
                 <label>Vehicle Type</label>
                 <select id="transport_vehicle">
-                  <option></option>
+                  <option>Car</option>
                   <option>H1 Van</option>
                   <option>HiAce</option>
                   <option>Coaster</option>
                   <option>Bus</option>
                   <option>GMC / SUV</option>
-                  <option>Train</option>
+                  <option>Self</option>
                 </select>
               </div>
             </div>
@@ -454,7 +462,7 @@
                     <li>Voucher is non-transferable and has no cash value.</li>
                     <li>Cancellations or modifications are subject to supplier policy and fees.</li>
                     <li>Trip Again Pvt Ltd acts as an agent; not liable for third-party delays or cancellations.</li>
-                    <li>Traveller must ry valid passport & visa at all times.</li>
+                    <li>Traveller must carry valid passport & visa at all times.</li>
                     <li>Any incidental charges are payable by the guest at hotel check-in/out.</li>
                     <li>For full terms, contact Trip Again Pvt Ltd — info@tripagainp.pk.</li>
                   </ol>
@@ -464,7 +472,7 @@
               <div style="margin-top:20px; display:flex; justify-content:space-between; align-items:flex-start;">
     <!-- Left side -->
     <div>
-      <div style="font-size:12px; color:#666; margin-top:10px;">This voucher is computer generated and valid without signature.</div>
+      <div style="font-size:12px; color:#666; margin-top: 10px;">This voucher is computer generated and valid without signature.</div>
       <div style="font-size:12px; color:#666; margin-top:4px;">
         Digital Voucher Engine Developed by <strong>GroTech Solutions</strong>.
       </div>
@@ -938,7 +946,7 @@ el('btnGenerate').addEventListener('click', () => {
           el('transport_route').value = data.transport.route || 'Option 1';
           toggleCustomRoute();
           el('custom_transport').value = data.transport.custom || '';
-          el('transport_vehicle').value = data.transport.vehicle || '';
+          el('transport_vehicle').value = data.transport.vehicle || 'Car';
         }
 
         // remarks
@@ -993,27 +1001,73 @@ function downloadPdf(){
       return;
     }
     
+    // Get voucher number dynamically
+    const voucherNumberElement = document.getElementById('pv_voucherNo');
+    let voucherNumber = 'voucher';
+    
+    if (voucherNumberElement && voucherNumberElement.textContent) {
+      // Clean the voucher number - remove any unwanted characters and trim spaces
+      voucherNumber = voucherNumberElement.textContent
+        .trim()
+        .replace(/[^a-zA-Z0-9-_]/g, '_') // Replace special chars with underscore
+        .replace(/_+/g, '_') // Replace multiple underscores with single
+        .replace(/^_|_$/g, ''); // Remove leading/trailing underscores
+      
+      // If after cleaning it's empty, use default
+      if (!voucherNumber) {
+        voucherNumber = 'voucher';
+      }
+    }
+    
+    // Add PDF mode class to hide Action columns
+    element.classList.add('pdf-export');
+    
     const opt = {
       margin: 0.5,
-      filename: (pv_voucherNo.textContent || 'voucher') + '.pdf',
+      filename: `${voucherNumber}.pdf`, // Dynamic filename
       image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
+      html2canvas: { 
+        scale: 2,
+        useCORS: true,
+        logging: false
+      },
       jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
     };
+
     
     // Show loading indicator
     const originalText = el('btnPdf').textContent;
     el('btnPdf').textContent = 'Generating PDF...';
     el('btnPdf').disabled = true;
     
-    html2pdf().set(opt).from(element).save().finally(() => {
-      // Restore button state
-      el('btnPdf').textContent = originalText;
-      el('btnPdf').disabled = false;
-    });
+    // Small delay to ensure CSS is applied before capture
+    setTimeout(() => {
+      html2pdf().set(opt).from(element).save().then(() => {
+        // Remove PDF mode class
+        element.classList.remove('pdf-export');
+        
+        // Restore button state
+        el('btnPdf').textContent = originalText;
+        el('btnPdf').disabled = false;
+      }).catch((error) => {
+        console.error('PDF generation error:', error);
+        // Remove PDF mode class even if error occurs
+        element.classList.remove('pdf-export');
+        el('btnPdf').textContent = 'Download PDF';
+        el('btnPdf').disabled = false;
+        alert('Failed to generate PDF. Please try again.');
+      });
+    }, 100);
     
   } catch (error) {
     console.error('PDF generation failed:', error);
+    
+    // Remove PDF mode class even if error occurs
+    const element = document.getElementById('voucherPreview');
+    if (element) {
+      element.classList.remove('pdf-export');
+    }
+    
     alert('Failed to generate PDF. Please try again.');
     el('btnPdf').textContent = 'Download PDF';
     el('btnPdf').disabled = false;
@@ -1039,5 +1093,3 @@ function downloadPdf(){
     </script>
   </body>
   </html>
-
-
